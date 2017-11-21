@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8" />
+    <meta DeadzoneDemo="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="text/javascript" src="lib/phaser.min.js"></script>
+    <script type="text/javascript" src="js/Boot.js"></script>
+    <script type="text/javascript" src="js/Preloader.js"></script>
+    <script type="text/javascript" src="js/Main.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <title>DeadzoneDemo</title>
+
+</head>
+
+<body>
+
+    <div id="gameContainer"></div>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+
+        var game = new Phaser.Game(960, 540, Phaser.AUTO, 'gameContainer');
+
+        game.state.add('Boot', DeadzoneDemo.Boot);
+        game.state.add('Preloader', DeadzoneDemo.Preloader);
+        game.state.add('Main', DeadzoneDemo.Main);
+
+        game.state.start('Boot');
+    };
+
+    </script>
+
+</body>
+
+</html>
