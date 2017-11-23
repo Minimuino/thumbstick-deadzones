@@ -31,7 +31,7 @@ def map_range(v, (old_min, old_max, new_min, new_max)):
 
 # DEADZONE TYPES
 
-#TODO: Normalize stick_input for all functions
+#TODO: Add color-by-axis support
 
 def dz_none(stick_input, deadzone):
     return stick_input[0], stick_input[1]
@@ -57,7 +57,7 @@ def dz_radial(stick_input, deadzone):
         return stick_input[0], stick_input[1]
 
 def dz_scaled_axial_x(stick_input, deadzone):
-    max_value = height / 2
+    max_value = 1
     x_val = 0
     sign = np.sign(stick_input[0])
     if abs(stick_input[0]) > deadzone:
@@ -65,7 +65,7 @@ def dz_scaled_axial_x(stick_input, deadzone):
     return x_val, 0
 
 def dz_scaled_axial_y(stick_input, deadzone):
-    max_value = height / 2
+    max_value = 1
     y_val = 0
     sign = np.sign(stick_input[1])
     if abs(stick_input[1]) > deadzone:
@@ -73,7 +73,7 @@ def dz_scaled_axial_y(stick_input, deadzone):
     return 0, y_val
 
 def dz_scaled_axial(stick_input, deadzone):
-    max_value = height / 2
+    max_value = 1
     x_val = 0
     y_val = 0
     sign = np.sign(stick_input)
@@ -84,7 +84,7 @@ def dz_scaled_axial(stick_input, deadzone):
     return x_val, y_val
 
 def dz_scaled_radial(stick_input, deadzone):
-    max_value = height / 2
+    max_value = 1
     min_value = 0
     input_magnitude = np.linalg.norm(stick_input)
     sign = np.sign(stick_input)
@@ -106,7 +106,7 @@ def dz_hybrid(stick_input, deadzone):
 height = 400
 width  = 400
 center = (height/2, width/2)
-deadzone = 40
+deadzone = 0.2
 deadzone_function = dz_scaled_axial
 
 def main():
@@ -117,13 +117,18 @@ def main():
     # Draw gradient and deadzone
     for i in range(height):
         for j in range(width):
+            # Simulate stick input
             fake_stick_input = np.array([j - center[1], i - center[0]], dtype=np.float)
-            n, m = deadzone_function(fake_stick_input, deadzone)
-            dist_to_center = dist.euclidean((n + center[1], m + center[0]), center)
-            if dist_to_center > height/2:
+            fake_stick_input /= (height / 2)
+            # Clamp fake input to stick boundaries
+            magnitude = np.linalg.norm(fake_stick_input)
+            if magnitude > 1.0:
                 img[i,j] = 0
             else:
-                img[i,j] = map_range(dist_to_center, (0, height/2, 0, 255))
+                # Compute deadzoned value
+                n, m = deadzone_function(fake_stick_input, deadzone)
+                dz_magnitude = np.linalg.norm([n,m])
+                img[i,j] = map_range(dz_magnitude, (0, 1, 0, 255))
 
     # Print image
     plt.imshow(img, cmap=plt.cm.gray, vmin=0, vmax=255,

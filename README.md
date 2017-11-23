@@ -12,3 +12,7 @@ Deadzone types
 --------------
 
 Under construction
+
+First explain how to interpret the graphs.
+
+Second discuss deadzone types.
