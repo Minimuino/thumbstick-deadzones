@@ -30,9 +30,6 @@ def map_range(v, (old_min, old_max, new_min, new_max)):
 
 
 # DEADZONE TYPES
-
-#TODO: Add color-by-axis support
-
 def dz_none(stick_input, deadzone):
     return stick_input[0], stick_input[1]
 
@@ -101,16 +98,17 @@ def dz_scaled_radial(stick_input, deadzone):
 def dz_hybrid(stick_input, deadzone):
     pass
 
+################################################################################
 
 # INPUT PARAMETERS
 height = 400
 width  = 400
 center = (height/2, width/2)
 deadzone = 0.2
-deadzone_function = dz_scaled_axial
+deadzone_function = dz_scaled_radial
+mode = 'rgb'
 
-def main():
-
+def generate_gray_image():
     # Base blank image
     img = np.full((height, width), 0, np.uint8)
 
@@ -135,6 +133,40 @@ def main():
                aspect='equal', interpolation='bilinear')
     plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
     plt.show(False)
+
+def generate_rgb_image():
+    # Base blank image
+    img = np.full((height, width, 3), 0, np.uint8)
+
+    # Draw gradient and deadzone
+    for i in range(height):
+        for j in range(width):
+            # Simulate stick input
+            fake_stick_input = np.array([j - center[1], i - center[0]], dtype=np.float)
+            fake_stick_input /= (height / 2)
+            # Clamp fake input to stick boundaries
+            magnitude = np.linalg.norm(fake_stick_input)
+            if magnitude > 1.0:
+                img[i,j,0] = 0
+            else:
+                # Compute deadzoned value
+                n, m = deadzone_function(fake_stick_input, deadzone)
+                img[i,j,0] = map_range(abs(n), (0, 1, 0, 255))
+                img[i,j,2] = map_range(abs(m), (0, 1, 0, 255))
+
+    # Print image
+    plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB), vmin=0, vmax=255,
+               aspect='equal', interpolation='bilinear')
+    plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+    plt.show(False)
+
+def main():
+
+    img = None
+    if mode == 'gray':
+        img = generate_gray_image()
+    elif mode == 'rgb':
+        img = generate_rgb_image()
 
     # Listen for input
     command = raw_input()
