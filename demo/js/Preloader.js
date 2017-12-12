@@ -15,6 +15,15 @@ DeadzoneDemo.Preloader.prototype =
 		// this.load.image('background', 'img/background.png');
 
 		// this.load.spritesheet('candy', 'img/candy.png', 82, 98);
+
+		this.load.image('phaser', 'assets/image/phaser-dude.png');
+		this.load.image('background', 'assets/image/checkerboard.png');
+		this.load.image('img_dz_None', 'assets/image/dz_none.png');
+		this.load.image('img_dz_Axial', 'assets/image/dz_axial.png');
+		this.load.image('img_dz_Radial', 'assets/image/dz_radial.png');
+		this.load.image('img_dz_Scaled Axial', 'assets/image/dz_none.png');
+		this.load.image('img_dz_Scaled Radial', 'assets/image/dz_scaled_radial.png');
+		this.load.image('img_dz_Hybrid', 'assets/image/dz_none.png');
 	},
 
 	create: function()
