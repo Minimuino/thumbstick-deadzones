@@ -8,6 +8,7 @@
     <meta DeadzoneDemo="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script type="text/javascript" src="lib/phaser.min.js"></script>
+    <!--  <script type="text/javascript" src="plugins/phaser-debug.js"></script>  -->
     <script type="text/javascript" src="js/Boot.js"></script>
     <script type="text/javascript" src="js/Preloader.js"></script>
     <script type="text/javascript" src="js/Main.js"></script>
@@ -26,7 +27,7 @@
 
     window.onload = function() {
 
-        var game = new Phaser.Game(960, 540, Phaser.AUTO, 'gameContainer');
+        var game = new Phaser.Game(960, 540, Phaser.CANVAS, 'gameContainer');
 
         game.state.add('Boot', DeadzoneDemo.Boot);
         game.state.add('Preloader', DeadzoneDemo.Preloader);

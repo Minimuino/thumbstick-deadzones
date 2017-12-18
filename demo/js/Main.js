@@ -1,10 +1,30 @@
+/*
+	Copyright (C) 2017 Carlos Pérez Ramil
+
+	This file is part of Thumbstick Deadzones project.
+
+	The Thumbstick Deadzones project is free software: you can redistribute it
+	and/or modify it under the terms of the GNU General Public License as
+	published by the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	The Thumbstick Deadzones project is distributed in the hope that it will be
+	useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with the Thumbstick Deadzones project.
+	If not, see <http://www.gnu.org/licenses/>.
+*/
+
 DeadzoneDemo.Main = function(game)
 {
 	this.player;
 	this.pad1;
 	this.dz_value;
 	this.dz_type;
-	this.dz_names = ["None", "Axial", "Radial", "Scaled Axial", "Scaled Radial", "Hybrid"];
+	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial"];
 	this.display_text;
 	this.display_img;
 
@@ -15,9 +35,15 @@ DeadzoneDemo.Main.prototype =
 {
 	create: function()
 	{
-		this.add.sprite(0, 0, 'background');
-		this.player = this.add.sprite(300, 300, 'phaser');
+		// World
+		this.add.tileSprite(0, 0, 1920, 1920, 'background');
+		this.world.setBounds(0, 0, 1920, 1920);
+		this.player = this.add.sprite(this.world.centerX, this.world.centerY, 'phaser');
 		this.player.anchor.setTo(0.5, 0.5);
+
+		// Camera
+		this.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+		//this.camera.deadzone = new Phaser.Rectangle(100, 100, 600, 400);
 
 		// Text box
 		var text_bar = this.add.graphics();
@@ -31,10 +57,14 @@ DeadzoneDemo.Main.prototype =
 		this.display_text.setTextBounds(150, 40, 400, 100);
 		this.display_img = this.add.sprite(30, 40, 'img_dz_None');
 		this.display_img.scale.setTo(0.22, 0.22);
+		text_bar.fixedToCamera = true;
+		this.display_text.fixedToCamera = true;
+		this.display_img.fixedToCamera = true;
 
+		// Input
 		this.input.gamepad.start();
 		this.input.gamepad.setDeadZones(0.0);
-		this.dz_value = 0.17;
+		this.dz_value = 0.2;
 		this.dz_type = 1;
 
 		// To listen to buttons from a specific pad listen directly on that pad game.input.gamepad.padX, where X = pad 1-4
@@ -45,6 +75,11 @@ DeadzoneDemo.Main.prototype =
 	addButtons: function()
 	{
 		this.pad1.onDownCallback = this.onButtonDown;
+	},
+
+	mapRange: function(v, old_min, old_max, new_min, new_max)
+	{
+		return (new_min + (new_max - new_min) * (v - old_min) / (old_max - old_min));
 	},
 
 	dzNone: function(stick_input, deadzone)
@@ -62,7 +97,11 @@ DeadzoneDemo.Main.prototype =
 
 	dzRadial: function(stick_input, deadzone)
 	{
-		return stick_input;
+		var magnitude = stick_input.getMagnitude();
+		if (magnitude < deadzone)
+			return new Phaser.Point(0, 0);
+		else
+			return stick_input;
 	},
 
 	dzScaledAxial: function(stick_input, deadzone)
@@ -72,7 +111,18 @@ DeadzoneDemo.Main.prototype =
 
 	dzScaledRadial: function(stick_input, deadzone)
 	{
-		return stick_input;
+		var magnitude = stick_input.getMagnitude();
+		if (magnitude < deadzone)
+		{
+			return new Phaser.Point(0, 0);
+		}
+		else
+		{
+			var input_normalized = Phaser.Point.normalize(stick_input);
+			var x_val = input_normalized.x * ((magnitude - deadzone) / (1 - deadzone));
+			var y_val = input_normalized.y * ((magnitude - deadzone) / (1 - deadzone));
+			return new Phaser.Point(x_val, y_val);
+		}
 	},
 
 	dzHybrid: function(stick_input, deadzone)
@@ -114,9 +164,9 @@ DeadzoneDemo.Main.prototype =
 			var left_stick_y = this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y);
 
 			var delta = this.applyDeadzone(new Phaser.Point(left_stick_x, left_stick_y));
-			this.dbg_string = "Delta: " + delta.x + ", " + delta.y + ", dz_type: " + this.dz_type;
-			this.player.x += delta.x * 10;
-			this.player.y += delta.y * 10;
+			this.dbg_string = "Delta: " + delta.x + ", " + delta.y;
+			this.player.x += delta.x * 6;
+			this.player.y += delta.y * 6;
 		}
 	},
 
