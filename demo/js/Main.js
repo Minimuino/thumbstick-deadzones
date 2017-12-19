@@ -24,7 +24,7 @@ DeadzoneDemo.Main = function(game)
 	this.pad1;
 	this.dz_value;
 	this.dz_type;
-	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial"];
+	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial", "Sloped Axial", "Sloped Sc. Axial", "Hybrid"];
 	this.display_text;
 	this.display_img;
 
@@ -104,11 +104,6 @@ DeadzoneDemo.Main.prototype =
 			return stick_input;
 	},
 
-	dzScaledAxial: function(stick_input, deadzone)
-	{
-		return stick_input;
-	},
-
 	dzScaledRadial: function(stick_input, deadzone)
 	{
 		var magnitude = stick_input.getMagnitude();
@@ -119,15 +114,60 @@ DeadzoneDemo.Main.prototype =
 		else
 		{
 			var input_normalized = Phaser.Point.normalize(stick_input);
-			var x_val = input_normalized.x * ((magnitude - deadzone) / (1 - deadzone));
-			var y_val = input_normalized.y * ((magnitude - deadzone) / (1 - deadzone));
-			return new Phaser.Point(x_val, y_val);
+			var result = new Phaser.Point();
+			result.x = input_normalized.x * ((magnitude - deadzone) / (1 - deadzone));
+			result.y = input_normalized.y * ((magnitude - deadzone) / (1 - deadzone));
+			return result;
 		}
+	},
+
+	dzSlopedAxial: function(stick_input, deadzone)
+	{
+		var deadzone_x = deadzone * Math.abs(stick_input.y);
+		var deadzone_y = deadzone * Math.abs(stick_input.x);
+		var result = new Phaser.Point(
+			(Math.abs(stick_input.x) > deadzone_x) ? stick_input.x : 0,
+			(Math.abs(stick_input.y) > deadzone_y) ? stick_input.y : 0);
+		return result;
+	},
+
+	dzSlopedScaledAxial: function(stick_input, deadzone)
+	{
+		var deadzone_x = deadzone * Math.abs(stick_input.y);
+		var deadzone_y = deadzone * Math.abs(stick_input.x);
+		var sign = new Phaser.Point(Math.sign(stick_input.x), Math.sign(stick_input.y));
+		var result = new Phaser.Point(0, 0);
+		if (Math.abs(stick_input.x) > deadzone_x)
+		{
+			result.x = sign.x * this.mapRange(Math.abs(stick_input.x), deadzone_x, 1, 0, 1);
+		}
+		if (Math.abs(stick_input.y) > deadzone_y)
+		{
+			result.y = sign.y * this.mapRange(Math.abs(stick_input.y), deadzone_y, 1, 0, 1);
+		}
+		return result;
 	},
 
 	dzHybrid: function(stick_input, deadzone)
 	{
-		return stick_input;
+		var deadzone_x = deadzone * Math.abs(stick_input.y);
+		var deadzone_y = deadzone * Math.abs(stick_input.x);
+		var sign = new Phaser.Point(Math.sign(stick_input.x), Math.sign(stick_input.y));
+		var result = new Phaser.Point(0, 0);
+
+		// First, check that input does not fall within deadzone
+		if (stick_input.getMagnitude() < deadzone)
+		{
+			return result;
+		}
+
+		// Then apply a sloped_scaled_axial transformation
+		var partial_output = this.dzSlopedScaledAxial(stick_input, deadzone);
+
+		// Then apply a scaled_radial transformation
+		var result = this.dzScaledRadial(partial_output, deadzone);
+
+		return result;
 	},
 
 	applyDeadzone: function(stick_input)
@@ -138,10 +178,12 @@ DeadzoneDemo.Main.prototype =
 			"Radial": this.dzRadial,
 			"Scaled Axial": this.dzScaledAxial,
 			"Scaled Radial": this.dzScaledRadial,
+			"Sloped Axial": this.dzSlopedAxial,
+			"Sloped Sc. Axial": this.dzSlopedScaledAxial,
 			"Hybrid": this.dzHybrid
 		};
 		var name = this.dz_names[this.dz_type];
-		return dz_functions[name](stick_input, this.dz_value);
+		return dz_functions[name].call(this, stick_input, this.dz_value);
 	},
 
 	update: function()

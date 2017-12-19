@@ -46,7 +46,9 @@ DeadzoneDemo.Preloader.prototype =
 		this.load.image('img_dz_Radial', 'assets/image/dz_radial_gray.png');
 		this.load.image('img_dz_Scaled Axial', 'assets/image/dz_none_gray.png');
 		this.load.image('img_dz_Scaled Radial', 'assets/image/dz_scaled_radial_gray.png');
-		this.load.image('img_dz_Hybrid', 'assets/image/dz_none_gray.png');
+		this.load.image('img_dz_Sloped Axial', 'assets/image/dz_sloped_axial_rgb.png');
+		this.load.image('img_dz_Sloped Sc. Axial', 'assets/image/dz_sloped_scaled_axial_rgb.png');
+		this.load.image('img_dz_Hybrid', 'assets/image/dz_hybrid_rgb.png');
 	},
 
 	create: function()

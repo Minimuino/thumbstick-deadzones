@@ -27,7 +27,7 @@ First I will explain how to interpret the graphs. We will be working with two ty
 			   thumbstick processed input (y): blue value
 			   (show with an image where are 0 and 1 values for every variable)
 
-Second discuss deadzone types. If we don't apply a deadzone, our raw input magnitude graph will look like this:
+Now I will discuss deadzone types. If we don't apply a deadzone, our raw input magnitude graph will look like this:
 
 ![thumbstick graph - no deadzone][dz_none_gray]
 
@@ -35,7 +35,7 @@ We're now going to see how it looks with a simple axial deadzone:
 
 ![thumbstick graph - axial][dz_axial_gray]
 
-This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. On the demo, try to perform a slow circular movement, and you will notice this issue. So here is the next step: radial deadzone:
+This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular movement, and you will notice this issue. So here is the next step: radial deadzone:
 
 ![thumbstick graph - radial][dz_radial_gray]
 
@@ -46,7 +46,22 @@ But with this deadzone type there is another issue: we lose precision on the pro
 
 ![thumbstick graph - scaled radial][dz_scaled_radial_gray]
 
+Now try the slowest movement you can perform with both radial and scaled radial deadzones. You will notice that with the scaled radial you have a wider speed range, in particular at low speeds. The transition from stillnes to movement is much smoother with scaled radial.
+
 Ideally, this would be the deadzone that fits every project's needs. Unfortunately, this is not true. Sometimes we don't want the same amount of deadzone along an axis. At the demo, select the scaled radial deadzone and try to follow one of the horizontal blue lines at high speed. It's possible, but not easy to get a pure horizontal movement (i.e. look at the bottom left corner of the screen and try to get a 0 on the second axis). Because of this, we need a new deadzone type:
+
+![thumbstick graph - hybrid][dz_hybrid_rgb]
+
+Useful tests for the [demo]():
+1. Do not touch the stick. Does the character stand still?
+
+2. Try to perform a really soft acceleration. Is the transition from stillness to movement sudden or smooth?
+
+3. Is it possible to perform a slow horizontal/vertical movement with a small angle rotation? Or does it feel like there are only 3 directions (horizontal/vertical/diagonal)?
+
+4. Is it easy to perform a pure horizontal/vertical movement?
+
+5. Test how easy is to do the following: align character's feet with one of the deep blue horizontal lines' edge; after that, move along that edge for a couple of seconds; then start to move slowly towards the other edge of the line; when you've reached it, keep moving along that edge for another two seconds. You can do this test at various speeds.
 
 License
 -------
@@ -64,3 +79,4 @@ Permission is granted to copy, distribute and/or modify this document under the 
 [dz_radial_gray]: demo/assets/image/dz_radial_gray.png "No deadzone"
 [dz_scaled_axial_gray]: demo/assets/image/dz_scaled_axial_gray.png "No deadzone"
 [dz_scaled_radial_gray]: demo/assets/image/dz_scaled_radial_gray.png "No deadzone"
+[dz_hybrid_rgb]: demo/assets/image/dz_hybrid_rgb.png "No deadzone"
