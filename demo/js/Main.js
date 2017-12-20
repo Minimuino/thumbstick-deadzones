@@ -52,7 +52,7 @@ DeadzoneDemo.Main.prototype =
 		text_bar.beginFill(0xffffff, 0.7);
 		text_bar.drawRect(25, 35, 98, 98);
 		var text_style = { font: "bold 32px Arial", fill: "#fff", boundsAlignV: "top" };
-		this.display_text = this.add.text(0, 0, this.dz_names[1], text_style);
+		this.display_text = this.add.text(0, 0, this.dz_names[0], text_style);
 		this.display_text.setShadow(3, 3, 'rgba(0,0,0,0.6)', 2);
 		this.display_text.setTextBounds(150, 40, 400, 100);
 		this.display_img = this.add.sprite(30, 40, 'img_dz_None');
@@ -65,7 +65,7 @@ DeadzoneDemo.Main.prototype =
 		this.input.gamepad.start();
 		this.input.gamepad.setDeadZones(0.0);
 		this.dz_value = 0.2;
-		this.dz_type = 1;
+		this.dz_type = 0;
 
 		// To listen to buttons from a specific pad listen directly on that pad game.input.gamepad.padX, where X = pad 1-4
 		this.pad1 = this.input.gamepad.pad1;
@@ -161,11 +161,11 @@ DeadzoneDemo.Main.prototype =
 			return result;
 		}
 
-		// Then apply a sloped_scaled_axial transformation
-		var partial_output = this.dzSlopedScaledAxial(stick_input, deadzone);
-
 		// Then apply a scaled_radial transformation
-		var result = this.dzScaledRadial(partial_output, deadzone);
+		var partial_output = this.dzScaledRadial(stick_input, deadzone);
+
+		// Then apply a sloped_scaled_axial transformation
+		var result = this.dzSlopedScaledAxial(partial_output, deadzone);
 
 		return result;
 	},

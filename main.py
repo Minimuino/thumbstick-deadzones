@@ -124,7 +124,6 @@ def dz_sloped_scaled_axial(stick_input, deadzone):
 
 def dz_scaled_radial(stick_input, deadzone):
     input_magnitude = np.linalg.norm(stick_input)
-    sign = np.sign(stick_input)
     if input_magnitude < deadzone:
         return 0, 0
     else:
@@ -142,11 +141,11 @@ def dz_hybrid(stick_input, deadzone):
     if input_magnitude < deadzone:
         return 0, 0
 
-    # Then apply a sloped_scaled_axial transformation
-    partial_output = dz_sloped_scaled_axial(stick_input, deadzone)
-
     # Then apply a scaled_radial transformation
-    final_output = dz_scaled_radial(partial_output, deadzone)
+    partial_output = dz_scaled_radial(stick_input, deadzone)
+
+    # Then apply a sloped_scaled_axial transformation
+    final_output = dz_sloped_scaled_axial(partial_output, deadzone)
 
     return final_output
 
@@ -158,8 +157,8 @@ height = 400
 width  = 400
 center = (height/2, width/2)
 deadzone = 0.2
-deadzone_function = dz_hybrid
-mode = 'rgb'
+deadzone_function = dz_scaled_radial
+mode = 'gray'
 
 def generate_gray_image():
     # Base blank image
