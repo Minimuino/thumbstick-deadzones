@@ -22,11 +22,12 @@ DeadzoneDemo.Main = function(game)
 {
 	this.player;
 	this.pad1;
-	this.dz_value;
+	this.dz_value = 0;
 	this.dz_type;
 	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial", "Sloped Axial", "Sloped Sc. Axial", "Hybrid"];
-	this.display_text;
+	this.display_text = [];
 	this.display_img;
+	this.cursors;
 
 	this.dbg_string;
 };
@@ -52,24 +53,58 @@ DeadzoneDemo.Main.prototype =
 		text_bar.beginFill(0xffffff, 0.7);
 		text_bar.drawRect(25, 35, 98, 98);
 		var text_style = { font: "bold 32px Arial", fill: "#fff", boundsAlignV: "top" };
-		this.display_text = this.add.text(0, 0, this.dz_names[0], text_style);
-		this.display_text.setShadow(3, 3, 'rgba(0,0,0,0.6)', 2);
-		this.display_text.setTextBounds(150, 40, 400, 100);
+		this.display_text[0] = this.add.text(0, 0, this.dz_names[0], text_style);
+		this.display_text[0].setShadow(3, 3, 'rgba(0,0,0,0.6)', 2);
+		this.display_text[0].setTextBounds(150, 40, 400, 100);
 		this.display_img = this.add.sprite(30, 40, 'img_dz_None');
 		this.display_img.scale.setTo(0.22, 0.22);
 		text_bar.fixedToCamera = true;
-		this.display_text.fixedToCamera = true;
+		this.display_text[0].fixedToCamera = true;
 		this.display_img.fixedToCamera = true;
+
+		var text_style_2 = { font: "16px Arial", fill: "#fff", boundsAlignV: "top" };
+		this.display_text[1] = this.add.text(0, 0, "dz value: " + this.dz_value, text_style_2);
+		this.display_text[1].setTextBounds(150, 95, 400, 100);
+		this.display_text[1].fixedToCamera = true;
 
 		// Input
 		this.input.gamepad.start();
 		this.input.gamepad.setDeadZones(0.0);
-		this.dz_value = 0.2;
+		this.updateDzValue(0.2);
 		this.dz_type = 0;
+		this.createCursors();
 
 		// To listen to buttons from a specific pad listen directly on that pad game.input.gamepad.padX, where X = pad 1-4
 		this.pad1 = this.input.gamepad.pad1;
 		this.pad1.addCallbacks(this, { onConnect: this.addButtons });
+	},
+
+	createCursors: function()
+	{
+		this.cursors = this.input.keyboard.createCursorKeys();
+		this.cursors.up.onDown.add(function() { this.updateDzValue(0.01); }, this);
+		this.cursors.up.onHoldCallback = function() {
+			if (this.cursors.up.duration > 300) this.updateDzValue(0.01);
+		};
+		this.cursors.up.onHoldContext = this;
+
+		this.cursors.down.onDown.add(function() { this.updateDzValue(-0.01); }, this);
+		this.cursors.down.onHoldCallback = function() {
+			if (this.cursors.down.duration > 300) this.updateDzValue(-0.01);
+		};
+		this.cursors.down.onHoldContext = this;
+
+		this.cursors.left.onDown.add(function() { this.updateDzValue(-0.01); }, this);
+		this.cursors.left.onHoldCallback = function() {
+			if (this.cursors.left.duration > 300) this.updateDzValue(-0.01);
+		};
+		this.cursors.left.onHoldContext = this;
+
+		this.cursors.right.onDown.add(function() { this.updateDzValue(0.01); }, this);
+		this.cursors.right.onHoldCallback = function() {
+			if (this.cursors.right.duration > 300) this.updateDzValue(0.01);
+		};
+		this.cursors.right.onHoldContext = this;
 	},
 
 	addButtons: function()
@@ -80,6 +115,15 @@ DeadzoneDemo.Main.prototype =
 	mapRange: function(v, old_min, old_max, new_min, new_max)
 	{
 		return (new_min + (new_max - new_min) * (v - old_min) / (old_max - old_min));
+	},
+
+	updateDzValue: function(delta)
+	{
+		this.dz_value += delta;
+		if (this.dz_value > 0.6) this.dz_value = 0.6;
+		if (this.dz_value < 0.0) this.dz_value = 0.0;
+		var text = "dz value: " + this.dz_value;
+		this.display_text[1].setText(text.substring(0, 14));
 	},
 
 	dzNone: function(stick_input, deadzone)
@@ -202,30 +246,47 @@ DeadzoneDemo.Main.prototype =
 
 		if (this.pad1.connected)
 		{
+			// Read values
 			var left_stick_x = this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X);
 			var left_stick_y = this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y);
+			var right_stick_x = this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_X + 1);
+			var right_stick_y = this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_RIGHT_Y + 1);
 
-			var delta = this.applyDeadzone(new Phaser.Point(left_stick_x, left_stick_y));
-			this.dbg_string = "Delta: " + delta.x + ", " + delta.y;
-			this.player.x += delta.x * 6;
-			this.player.y += delta.y * 6;
+			// Left stick input
+			var left_delta = this.applyDeadzone(new Phaser.Point(left_stick_x, left_stick_y));
+			this.dbg_string = "Delta: " + left_delta.x + ", " + left_delta.y;
+			this.player.x += left_delta.x * 6;
+			this.player.y += left_delta.y * 6;
+
+			// Right stick input
+			var right_delta = this.applyDeadzone(new Phaser.Point(right_stick_x, right_stick_y));
+			if (right_delta.getMagnitude() > 0)
+			{
+				this.player.rotation = Math.atan2(right_delta.x, -right_delta.y);
+			}
 		}
 	},
 
 	onButtonDown: function(button_code)
 	{
+		// PS3 mappings
+		var PS3_LEFT_BUMPER = 10;
+		var PS3_RIGHT_BUMPER = 11;
+
 		// Update dz_type
-		if (button_code == Phaser.Gamepad.XBOX360_LEFT_BUMPER)
+		if ((button_code == Phaser.Gamepad.XBOX360_LEFT_BUMPER) ||
+			(button_code == PS3_LEFT_BUMPER))
 		{
 			this.dz_type = Math.max(this.dz_type - 1, 0);
 		}
-		else if (button_code == Phaser.Gamepad.XBOX360_RIGHT_BUMPER)
+		else if ((button_code == Phaser.Gamepad.XBOX360_RIGHT_BUMPER) ||
+				(button_code == PS3_RIGHT_BUMPER))
 		{
 			this.dz_type = Math.min(this.dz_type + 1, this.dz_names.length - 1);
 		}
 
 		// Update text box
-		this.display_text.setText(this.dz_names[this.dz_type]);
+		this.display_text[0].setText(this.dz_names[this.dz_type]);
 		var texture_name = 'img_dz_' + this.dz_names[this.dz_type];
 		this.display_img.loadTexture(texture_name);
 	},

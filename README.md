@@ -13,7 +13,7 @@ I recommend to open the demo in another tab and do some tests while reading this
 Deadzone types
 --------------
 
-# !!! Article under construction !!!
+** !!! Article under construction !!! **
 
 First I will explain how to interpret the graphs. We will be working with two types of graphs, both of them represent all possible values of some thumbstick input. Each pixel on the image corresponds to a single position of the stick.
 
@@ -84,7 +84,7 @@ def dz_scaled_radial(stick_input, deadzone):
 
 Now try the slowest movement you can perform with both radial and scaled radial deadzones. You will notice that with the scaled radial you have a wider speed range, in particular at low speeds. The transition from stillnes to movement is much smoother with scaled radial.
 
-Ideally, this would be the deadzone that fits every project's needs. Unfortunately, this is not true. Sometimes we don't want the same amount of deadzone along an axis. At the demo, select the scaled radial deadzone and try to follow one of the horizontal blue lines at high speed. It's possible, but far from easy to get a pure horizontal motion (i.e. look at the bottom left corner of the screen and try to get a 0 on the second axis). Many applications that work with analog input need at the same time to help the user to perform pure horizontal/vertical motion. So for this environments we need a special deadzone type.
+Ideally, this would be the deadzone that fits every project's needs. Unfortunately, this is not true. Sometimes we don't want the same amount of deadzone along an axis. At the demo, select the scaled radial deadzone and try to follow one of the horizontal blue lines at high speed. It's possible, but far from easy to get a pure horizontal motion (i.e. motion in X axis only). Look at the bottom left corner of the screen and try to get a 0 on the second axis. Many applications that work with analog input need at the same time to help the user to perform pure horizontal/vertical motion. So for this environments we need a special deadzone type.
 
 How could we accomplish this? Well, one step at a time. We know that
 
@@ -111,7 +111,7 @@ In the sample code you can see that now deadzone is split in two values (one for
 
 Previously we have learned that is not a good thing to see edges on the graph. Edges mean sudden changes in motion, gradients mean smooth transitions. So, like we've done with radial deadzone, we may now *scale* the sloped axial in order to get rid of edges.
 
-![thumbstick graph - sloped axial][dz_sloped_scaled_axial_rgb]
+![thumbstick graph - sloped scaled axial][dz_sloped_scaled_axial_rgb]
 
 ```python
 def dz_sloped_scaled_axial(stick_input, deadzone):
@@ -145,21 +145,40 @@ def dz_hybrid(stick_input, deadzone):
 
 Note that the order in which the transformations are applied is relevant: scaled radial function must be called first in order to avoid distortion for low input values.
 
+Testing
+-------
+
 Useful tests for the demo:
 1. Do not touch the stick. Does the character stand still?
 
 2. Try to perform a really soft acceleration. Is the transition from stillness to movement sudden or smooth?
 
-3. Is it possible to perform a slow horizontal/vertical motion with a small angle rotation? Or does it feel like there are only 3 directions (horizontal/vertical/diagonal)?
+3. Is it possible to perform a slow horizontal/vertical motion with a soft slope? Or does it feel like there are only 3 directions (horizontal/vertical/diagonal)?
 
 4. Is it easy to perform a pure horizontal/vertical motion?
 
 5. Test how easy is to do the following: align character's feet with one of the deep blue horizontal lines' edge; after that, move along that edge for a couple of seconds; then start to move slowly towards the other edge of the line; when you've reached it, keep moving along that edge for another two seconds. You can do this test at various speeds.
 
+6. With the right stick perform a circular motion at a constant angular speed. Does the character rotate smoothly? Or does he seem to "stop" for a moment at certain rotations (specifically when X=0 or Y=0)?
+
+I've been doing some testing with both Xbox 360 and PS3 official controllers (Debian + Firefox environment), and I've found something quite interesting: with PS3 controller there's no need to do deadzone processing at all. It works reeeally smooth in every case... with deadzone set to *None*! One may think that it could be just an excellent piece of hardware and no post-processing is needed. But test #6 reveals something against this hypothesis: it "stops" at certain positions, very similar to our hybrid deadzone behavior. That's a clear proof of a deadzone post-process running beneath the surface. Does the PS3 controller have kind of a built-in deadzone? Or is it the linux driver? No idea. So, please, if you can throw some light on this issue, I'd really appreciate it. I've also tested the Dualshock in Cocos2D engine with identical result.
+
+Well, so below you can see the results table for these tests that I've run. You can reproduce them in the demo. Also, I'm looking forward to test Xbox ONE controller as soon as possible.
+
+|  | 1 | 2 | 3 | 4 | 5 | 6 |
+|--|---|---|---|---|---|---|
+| Axial | | | | | | |
+| Radial |
+| Hybrid |
+| PS3? |
+
+Final notes
+-----------
+Well, that's all for now. I hope you've find it useful. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
+
 TODO
 ----
-- Demo: add editable deadzone amount (slider or something)
-- Demo: add second stick support for rotation test
+- Test more with PS3 controller
 - Finish this document
 
 License
@@ -172,13 +191,13 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 [dz_none_gray]: demo/assets/image/dz_none_gray.png "No deadzone"
 [dz_none_rgb]: demo/assets/image/dz_none_rgb.png "No deadzone"
-[dz_axial_gray]: demo/assets/image/dz_axial_gray.png "No deadzone"
-[dz_axial_x_gray]: demo/assets/image/dz_axial_x_gray.png "No deadzone"
-[dz_axial_y_gray]: demo/assets/image/dz_axial_y_gray.png "No deadzone"
-[dz_radial_gray]: demo/assets/image/dz_radial_gray.png "No deadzone"
-[dz_scaled_axial_gray]: demo/assets/image/dz_scaled_axial_gray.png "No deadzone"
-[dz_scaled_radial_gray]: demo/assets/image/dz_scaled_radial_gray.png "No deadzone"
-[dz_sloped_axial_gray]: demo/assets/image/dz_sloped_axial_gray.png "No deadzone"
-[dz_sloped_axial_rgb]: demo/assets/image/dz_sloped_axial_rgb.png "No deadzone"
-[dz_sloped_scaled_axial_rgb]: demo/assets/image/dz_sloped_scaled_axial_rgb.png "No deadzone"
-[dz_hybrid_rgb]: demo/assets/image/dz_hybrid_rgb.png "No deadzone"
+[dz_axial_gray]: demo/assets/image/dz_axial_gray.png "Axial deadzone"
+[dz_axial_x_gray]: demo/assets/image/dz_axial_x_gray.png "Axial deadzone (x axis)"
+[dz_axial_y_gray]: demo/assets/image/dz_axial_y_gray.png "Axial deadzone (y axis)"
+[dz_radial_gray]: demo/assets/image/dz_radial_gray.png "Radial deadzone"
+[dz_scaled_axial_gray]: demo/assets/image/dz_scaled_axial_gray.png "Scaled axial deadzone"
+[dz_scaled_radial_gray]: demo/assets/image/dz_scaled_radial_gray.png "Scaled radial deadzone"
+[dz_sloped_axial_gray]: demo/assets/image/dz_sloped_axial_gray.png "Sloped axial deadzone"
+[dz_sloped_axial_rgb]: demo/assets/image/dz_sloped_axial_rgb.png "Sloped axial deadzone"
+[dz_sloped_scaled_axial_rgb]: demo/assets/image/dz_sloped_scaled_axial_rgb.png "Sloped scaled axial deadzone"
+[dz_hybrid_rgb]: demo/assets/image/dz_hybrid_rgb.png "Hybrid deadzone"
