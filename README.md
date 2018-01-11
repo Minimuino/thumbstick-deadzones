@@ -21,13 +21,16 @@ First I will explain how to interpret the graphs. We will be working with two ty
 	Variables: thumbstick raw input (x): pixel x coord
                thumbstick raw input (y): pixel y coord
 			   thumbstick processed input (vector magnitude): gray value
-			   (show with an image where are 0 and 1 values for every variable)
+
+![Legend - Grayscale][legend_gray]
+
 - RGB: normalized axis value of input vector (red for X axis, blue for Y axis)
 	Variables: thumbstick raw input (x): pixel x coord
                thumbstick raw input (y): pixel y coord
 			   thumbstick processed input (x): red value
 			   thumbstick processed input (y): blue value
-			   (show with an image where are 0 and 1 values for every variable)
+
+![Legend - RGB][legend_rgb]
 
 Now I will discuss deadzone types. For each type, a graph and some python-ish pseudocode will be provided. First of all, if we don't apply a deadzone, our raw input magnitude graph will look like this:
 
@@ -89,9 +92,10 @@ Ideally, this would be the deadzone that fits every project's needs. Unfortunate
 How could we accomplish this? Well, one step at a time. We know that
 
 1. Axial deadzone is good for pure horizontal/vertical motion (high input values)
-2. Axial deadzone is bad for
+2. Axial deadzone is bad for low input values, as it causes a "snap to grid" effect.
+3. We need to scale the input to fit exactly the space outside the deadzone.
 
-All this leads us to the conclusion that we need a variable deadzone instead of a constant value. Like an axial deadzone function but with some slope in the edges, so that the deadzone is pretty low near the center and it constantly increases its value along the axis.
+Points 1 and 2 lead us to the conclusion that we need a variable deadzone instead of a constant value. Like an axial deadzone function but with some slope in the edges, so that the deadzone is pretty low near the center and it constantly increases its value along the axis.
 
 ![thumbstick graph - sloped axial][dz_sloped_axial_gray]
 
@@ -109,7 +113,7 @@ def dz_sloped_axial(stick_input, deadzone):
 
 In the sample code you can see that now deadzone is split in two values (one for each axis). Note also that the deadzone amount for X axis depends on the current Y value, and vice versa.
 
-Previously we have learned that is not a good thing to see edges on the graph. Edges mean sudden changes in motion, gradients mean smooth transitions. So, like we've done with radial deadzone, we may now *scale* the sloped axial in order to get rid of edges.
+Point 3 reminds us that is not a good thing to see edges on the graph. Edges mean sudden changes in motion, gradients mean smooth transitions. So, like we've done with radial deadzone, we may now *scale* the sloped axial in order to get rid of edges.
 
 ![thumbstick graph - sloped scaled axial][dz_sloped_scaled_axial_rgb]
 
@@ -148,7 +152,8 @@ Note that the order in which the transformations are applied is relevant: scaled
 Testing
 -------
 
-Useful tests for the demo:
+Relevant test cases for the demo:
+
 1. Do not touch the stick. Does the character stand still?
 
 2. Try to perform a really soft acceleration. Is the transition from stillness to movement sudden or smooth?
@@ -159,11 +164,11 @@ Useful tests for the demo:
 
 5. Test how easy is to do the following: align character's feet with one of the deep blue horizontal lines' edge; after that, move along that edge for a couple of seconds; then start to move slowly towards the other edge of the line; when you've reached it, keep moving along that edge for another two seconds. You can do this test at various speeds.
 
-6. With the right stick perform a circular motion at a constant angular speed. Does the character rotate smoothly? Or does he seem to "stop" for a moment at certain rotations (specifically when X=0 or Y=0)?
+6. With the right stick perform a circular motion at a constant angular speed. Does the character rotate smoothly? Or does he seem to "stop" for a moment at certain angles (specifically when X=0 or Y=0)?
 
-I've been doing some testing with both Xbox 360 and PS3 official controllers (Debian + Firefox environment), and I've found something quite interesting: with PS3 controller there's no need to do deadzone processing at all. It works reeeally smooth in every case... with deadzone set to *None*! One may think that it could be just an excellent piece of hardware and no post-processing is needed. But test #6 reveals something against this hypothesis: it "stops" at certain positions, very similar to our hybrid deadzone behavior. That's a clear proof of a deadzone post-process running beneath the surface. Does the PS3 controller have kind of a built-in deadzone? Or is it the linux driver? No idea. So, please, if you can throw some light on this issue, I'd really appreciate it. I've also tested the Dualshock in Cocos2D engine with identical result.
+I've been doing some testing with both Xbox 360 and PS3 official controllers (Debian + Firefox environment), and I've found something quite interesting: with PS3 controller there's no need to do deadzone processing at all. It works reeeally smooth in every case... with deadzone set to *None*! One may think that it could be just an excellent piece of hardware and no post-processing is needed. But test #6 reveals something against this hypothesis: it "stops" at certain angles, very similar to our hybrid deadzone behavior. That's a clear proof of a deadzone post-process running beneath the surface. Does the PS3 controller have kind of a built-in deadzone? Or is it the linux driver? No idea. So, please, if you can throw some light on this issue, I'd really appreciate it. I've also tested the Dualshock in Cocos2D engine with identical result.
 
-Well, so below you can see the results table for these tests that I've run. You can reproduce them in the demo. Also, I'm looking forward to test Xbox ONE controller as soon as possible.
+Well, so below you can see the results table for these tests that I've run. You can reproduce them in the demo. Also, I'm looking forward to test Xbox ONE and PS4 controllers as soon as possible.
 
 |  | 1 | 2 | 3 | 4 | 5 | 6 |
 |--|---|---|---|---|---|---|
@@ -179,6 +184,7 @@ Well, that's all for now. I hope you've find it useful. If you have any thoughts
 TODO
 ----
 - Test more with PS3 controller
+- Explore non-linear mappings
 - Finish this document
 
 License
@@ -189,6 +195,8 @@ Copyright (C)  2017  Carlos Pérez Ramil.
 Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included in the file "fdl-1.3.txt".
 
 
+[legend_gray]: demo/assets/image/legend_gray.png "Legend gray"
+[legend_rgb]: demo/assets/image/legend_rgb.png "Legend rgb"
 [dz_none_gray]: demo/assets/image/dz_none_gray.png "No deadzone"
 [dz_none_rgb]: demo/assets/image/dz_none_rgb.png "No deadzone"
 [dz_axial_gray]: demo/assets/image/dz_axial_gray.png "Axial deadzone"
