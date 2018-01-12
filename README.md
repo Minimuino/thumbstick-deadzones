@@ -46,7 +46,9 @@ Now I will discuss deadzone types. For each type, a graph and some python-ish ps
 
 Open the demo and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
 
-<img align="center" width="400" height="400" src="demo/assets/image/dz_axial_gray.png">
+---
+
+<img align="right" width="400" height="400" src="demo/assets/image/dz_axial_gray.png">
 
 ```python
 def dz_axial(stick_input, deadzone):
@@ -57,6 +59,8 @@ def dz_axial(stick_input, deadzone):
 		result.y = 0
 	return result
 ```
+
+<h3>d</h3>
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
 
