@@ -8,7 +8,7 @@ Gamepads and similar thumbstick controllers usually give an input value between 
 
 This work is an extension of [this great article](http://www.third-helix.com/2013/04/12/doing-thumbstick-dead-zones-right.html) by Josh Sutphin. Here I'll go through different approaches for implementing deadzones, along with a playable demo. I hope this helps someone to choose the right one for her project.
 
-I recommend to open the demo in another tab and do some tests while reading this document. Source code can be found in the "demo" folder (powered by the [Phaser engine](https://phaser.io/)). Also, in the file "main.py" you can find the program I used to generate all the images below (powered by [OpenCV](https://opencv.org/)).
+I recommend to open the <a href="https://minimuino.github.io/thumbstick-deadzones/demo/" target="_blank">demo</a> in another tab and do some tests while reading this document. Source code can be found in the "demo" folder (powered by the [Phaser engine](https://phaser.io/)). Also, in the file "main.py" you can find the program I used to generate all the images below (powered by [OpenCV](https://opencv.org/)).
 
 Deadzone types
 --------------
@@ -59,8 +59,6 @@ def dz_axial(stick_input, deadzone):
 		result.y = 0
 	return result
 ```
-
-<h3>d</h3>
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
 
