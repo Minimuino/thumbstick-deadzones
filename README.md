@@ -22,7 +22,11 @@ First I will explain how to interpret the graphs. We will be working with two ty
                thumbstick raw input (y): pixel y coord
 			   thumbstick processed input (vector magnitude): gray value
 
+---
+
 ![Legend - Grayscale][legend_gray]
+
+---
 
 - RGB: normalized axis value of input vector (red for X axis, blue for Y axis)
 	Variables: thumbstick raw input (x): pixel x coord
@@ -30,7 +34,11 @@ First I will explain how to interpret the graphs. We will be working with two ty
 			   thumbstick processed input (x): red value
 			   thumbstick processed input (y): blue value
 
+---
+
 ![Legend - RGB][legend_rgb]
+
+---
 
 Now I will discuss deadzone types. For each type, a graph and some python-ish pseudocode will be provided. First of all, if we don't apply a deadzone, our raw input magnitude graph will look like this:
 
@@ -38,9 +46,7 @@ Now I will discuss deadzone types. For each type, a graph and some python-ish ps
 
 Open the demo and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
 
----
-
-<img align="right" width="400" height="400" src="demo/assets/image/dz_axial_gray.png">
+<img align="center" width="400" height="400" src="demo/assets/image/dz_axial_gray.png">
 
 ```python
 def dz_axial(stick_input, deadzone):
@@ -51,9 +57,6 @@ def dz_axial(stick_input, deadzone):
 		result.y = 0
 	return result
 ```
-<p style="clear:both;">TEXT HERE</p>
-
----
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
 
