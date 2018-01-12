@@ -8,7 +8,7 @@ Gamepads and similar thumbstick controllers usually give an input value between 
 
 This work is an extension of [this great article](http://www.third-helix.com/2013/04/12/doing-thumbstick-dead-zones-right.html) by Josh Sutphin. Here I'll go through different approaches for implementing deadzones, along with a playable demo. I hope this helps someone to choose the right one for her project.
 
-I recommend to open the <a href="https://minimuino.github.io/thumbstick-deadzones/demo/" target="_blank">demo</a> in another tab and do some tests while reading this document. Source code can be found in the "demo" folder (powered by the [Phaser engine](https://phaser.io/)). Also, in the file "main.py" you can find the program I used to generate all the images below (powered by [OpenCV](https://opencv.org/)).
+I recommend to open the [demo](https://minimuino.github.io/thumbstick-deadzones/demo/) in another tab and do some tests while reading this document. Source code can be found in the "demo" folder (powered by the [Phaser engine](https://phaser.io/)). Also, in the file "main.py" you can find the program I used to generate all the images below (powered by [OpenCV](https://opencv.org/)).
 
 Deadzone types
 --------------
@@ -48,7 +48,9 @@ Open the demo and move around a bit, then release the stick. You'll see how the 
 
 ---
 
-<img align="right" width="400" height="400" src="demo/assets/image/dz_axial_gray.png">
+<p align="center">
+  <img width="400" height="400" alt="Axial deadzone" src="demo/assets/image/dz_axial_gray.png">
+</p>
 
 ```python
 def dz_axial(stick_input, deadzone):
@@ -158,6 +160,8 @@ def dz_hybrid(stick_input, deadzone):
 ```
 
 Note that the order in which the transformations are applied is relevant: scaled radial function must be called first in order to avoid distortion for low input values.
+
+You may not see very much difference between this final graph and the first raw input RGB graph. So we're going to compare them now in order to see the subtle differences.
 
 Testing
 -------
