@@ -46,8 +46,6 @@ Now I will discuss deadzone types. For each type, a graph and some python-ish ps
 
 Open the demo and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
 
----
-
 <p align="center">
   <img width="400" height="400" alt="Axial deadzone" src="demo/assets/image/dz_axial_gray.png">
 </p>
@@ -64,7 +62,9 @@ def dz_axial(stick_input, deadzone):
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
 
-![thumbstick graph - radial][dz_radial_gray]
+<p align="center">
+  <img width="400" height="400" alt="Radial deadzone" src="demo/assets/image/dz_radial_gray.png">
+</p>
 
 ```python
 def dz_radial(stick_input, deadzone):
@@ -84,7 +84,9 @@ def map_range(value, old_min, old_max, new_min, new_max):
 
 Then, we have our scaled radial deadzone:
 
-![thumbstick graph - scaled radial][dz_scaled_radial_gray]
+<p align="center">
+  <img width="400" height="400" alt="Scaled radial deadzone" src="demo/assets/image/dz_scaled_radial_gray.png">
+</p>
 
 ```python
 def dz_scaled_radial(stick_input, deadzone):
@@ -109,7 +111,9 @@ How could we accomplish this? Well, one step at a time. We know that
 
 Points 1 and 2 lead us to the conclusion that we need a variable deadzone instead of a constant value. Like an axial deadzone function but with some slope in the edges, so that the deadzone is pretty low near the center and it constantly increases its value along the axis.
 
-![thumbstick graph - sloped axial][dz_sloped_axial_gray]
+<p align="center">
+  <img width="400" height="400" alt="Sloped axial deadzone" src="demo/assets/image/dz_sloped_axial_gray.png">
+</p>
 
 ```python
 def dz_sloped_axial(stick_input, deadzone):
@@ -127,7 +131,9 @@ In the sample code you can see that now deadzone is split in two values (one for
 
 Point 3 reminds us that is not a good thing to see edges on the graph. Edges mean sudden changes in motion, gradients mean smooth transitions. So, like we've done with radial deadzone, we may now *scale* the sloped axial in order to get rid of edges.
 
-![thumbstick graph - sloped scaled axial][dz_sloped_scaled_axial_rgb]
+<p align="center">
+  <img width="400" height="400" alt="Sloped scaled axial deadzone" src="demo/assets/image/dz_sloped_scaled_axial_rgb.png">
+</p>
 
 ```python
 def dz_sloped_scaled_axial(stick_input, deadzone):
@@ -144,7 +150,9 @@ def dz_sloped_scaled_axial(stick_input, deadzone):
 
 Now we shall combine this function with the scaled radial in order to avoid undesired input when the stick is released:
 
-![thumbstick graph - hybrid][dz_hybrid_rgb]
+<p align="center">
+  <img width="400" height="400" alt="Hybrid deadzone" src="demo/assets/image/dz_hybrid_rgb.png">
+</p>
 
 ```python
 def dz_hybrid(stick_input, deadzone):
