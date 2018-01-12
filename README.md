@@ -48,7 +48,7 @@ def dz_axial(stick_input, deadzone):
 	if (abs(result.y) < deadzone)
 		result.y = 0
 	return result
-```| ![thumbstick graph - axial][dz_axial_gray]
+``` | ![thumbstick graph - axial][dz_axial_gray]
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
 
