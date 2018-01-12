@@ -13,7 +13,7 @@ I recommend to open the demo in another tab and do some tests while reading this
 Deadzone types
 --------------
 
-** !!! Article under construction !!! **
+**!!! Article under construction !!!**
 
 First I will explain how to interpret the graphs. We will be working with two types of graphs, both of them represent all possible values of some thumbstick input. Each pixel on the image corresponds to a single position of the stick.
 
@@ -38,7 +38,7 @@ Now I will discuss deadzone types. For each type, a graph and some python-ish ps
 
 Open the demo and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
 
-![thumbstick graph - axial][dz_axial_gray]
+<img align="right" width="400" height="400" src="[dz_axial_gray]">
 
 ```python
 def dz_axial(stick_input, deadzone):
