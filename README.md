@@ -15,12 +15,13 @@ Deadzone types
 
 **!!! Article under construction !!!**
 
-First I will explain how to interpret the graphs. We will be working with two types of graphs, both of them represent all possible values of some thumbstick input. Each pixel on the image corresponds to a single position of the stick.
 
-- Grayscale: normalized magnitude of input vector (black = 0; white = 1).
-	Variables: thumbstick raw input (x): pixel x coord
-               thumbstick raw input (y): pixel y coord
-			   thumbstick processed input (vector magnitude): gray value
+Now I will discuss deadzone types. For each type, a graph and some python-ish pseudocode will be provided. First of all I will explain how to interpret the graphs. We will be working with two types of graphs, both of them represent all possible values of some thumbstick input (with an arbitrary sampling rate):
+
+- Grayscale: normalized magnitude of input vector.
+- RGB: normalized axis value of input vector.
+
+Each pixel on the image corresponds to a single position of the stick. If we don't apply a deadzone, our raw input graphs will look like this:
 
 ---
 
@@ -28,23 +29,11 @@ First I will explain how to interpret the graphs. We will be working with two ty
 
 ---
 
-- RGB: normalized axis value of input vector (red for X axis, blue for Y axis)
-	Variables: thumbstick raw input (x): pixel x coord
-               thumbstick raw input (y): pixel y coord
-			   thumbstick processed input (x): red value
-			   thumbstick processed input (y): blue value
-
----
-
 ![Legend - RGB][legend_rgb]
 
 ---
 
-Now I will discuss deadzone types. For each type, a graph and some python-ish pseudocode will be provided. First of all, if we don't apply a deadzone, our raw input magnitude graph will look like this:
-
-![thumbstick graph - no deadzone][dz_none_gray]
-
-Open the demo and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
+Open the [demo](https://minimuino.github.io/thumbstick-deadzones/demo/) and move around a bit, then release the stick. You'll see how the character moves slightly although there's no user input anymore. That's what we want to solve by applying a deadzone function to the raw input. We'll try first the simplest approach: axial deadzone.
 
 <p align="center">
   <img width="400" height="400" alt="Axial deadzone" src="demo/assets/image/dz_axial_gray.png">
