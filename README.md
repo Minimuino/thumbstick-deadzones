@@ -158,7 +158,7 @@ Relevant test cases for the demo:
 
 2. Try to perform a really soft acceleration. Is the transition from stillness to movement sudden or smooth?
 
-3. Is it possible to perform a slow horizontal/vertical motion with a soft slope? Or does it feel like there are only 3 directions (horizontal/vertical/diagonal)?
+3. Is it possible to perform a **slow** horizontal/vertical motion with a soft slope? Or does it feel like there are only 3 directions (horizontal/vertical/diagonal)?
 
 4. Is it easy to perform a pure horizontal/vertical motion?
 
@@ -172,10 +172,10 @@ Well, so below you can see the results table for these tests that I've run. You 
 
 |  | 1 | 2 | 3 | 4 | 5 | 6 |
 |--|---|---|---|---|---|---|
-| Axial | | | | | | |
-| Radial |
-| Hybrid |
-| PS3? |
+| Axial | PASS | FAIL | FAIL | PASS | FAIL | FAIL |
+| Scaled Radial | PASS | PASS | PASS | FAIL | FAIL | PASS |
+| Hybrid | PASS | PASS | PASS | PASS | PASS | FAIL |
+| PS3? | PASS | PASS | PASS | PASS | PASS | FAIL |
 
 Final notes
 -----------
@@ -183,7 +183,7 @@ Well, that's all for now. I hope you've find it useful. If you have any thoughts
 
 TODO
 ----
-- Test more with PS3 controller
+- More testing with PS3, PS4, Xbox ONE controllers
 - Explore non-linear mappings
 - Finish this document
 
