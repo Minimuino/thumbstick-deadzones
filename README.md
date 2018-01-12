@@ -51,6 +51,7 @@ def dz_axial(stick_input, deadzone):
 		result.y = 0
 	return result
 ```
+<p style="clear:both;">TEXT HERE</p>
 
 ---
 
