@@ -158,7 +158,14 @@ def dz_hybrid(stick_input, deadzone):
 
 Note that the order in which the transformations are applied is relevant: scaled radial function must be called first in order to avoid distortion for low input values.
 
-You may not see very much difference between this final graph and the first raw input RGB graph. So we're going to compare them now in order to see the subtle differences.
+You may not see very much difference between this final graph and the first raw input RGB graph. So we're going to compare them now in order to see the subtle differences. The following graphs show two highlighted areas: yellow means `x =/= 0 AND y = 0`; cyan means `x = 0 AND y =/= 0`. Intuitively, if the stick position is within the yellow/cyan area we'll get input only in X/Y axis.
+
+<img width="400" height="400" alt="No deadzone" align="left" src="demo/assets/image/dz_none_highlighted.png">
+<img width="400" height="400" alt="Hybrid deadzone" align="right" src="demo/assets/image/dz_hybrid_highlighted.png">
+
+As you can see, without a deadzone it will be very difficult for a user to give input in one axis only. However, with the hybrid deadzone there's a safe area to perform one-axis input whose width depends not only on the deadzone value, but also on the current input reading.
+
+All the images above were generated with a deadzone value of 0.2 for illustrative purposes. In the real world it would be pretty high for a high-end controller, although the cheap ones actually need a similar value to work well.
 
 Testing
 -------
