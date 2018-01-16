@@ -162,6 +162,7 @@ You may not see very much difference between this final graph and the first raw 
 
 <img width="400" height="400" alt="No deadzone" align="left" src="demo/assets/image/dz_none_highlighted.png">
 <img width="400" height="400" alt="Hybrid deadzone" align="right" src="demo/assets/image/dz_hybrid_highlighted.png">
+<br>
 
 As you can see, without a deadzone it will be very difficult for a user to give input in one axis only. However, with the hybrid deadzone there's a safe area to perform one-axis input whose width depends not only on the deadzone value, but also on the current input reading.
 
