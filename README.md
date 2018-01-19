@@ -169,6 +169,31 @@ As you can see, without a deadzone it will be very difficult for a user to give 
 
 All the images above were generated with a deadzone value of 0.2 for illustrative purposes. In the real world it would be pretty high for a high-end controller, although the cheap ones actually need a similar value to work well.
 
+### Beyond deadzones: non-linear input
+Non-linear input mappings can be used to enhance precision in a certain interval, at the cost of losing precision on the other part. A common application for this kind of input are fine-grained aiming systems: with a thumbstick graph like the one below (left), users have a wider range of movements for low input values, which lets them to make very subtle adjustments much easier.
+
+![Non linear input - Cubic][dz_cubic_gray]
+<img width="400" height="400" alt="Cubic root" align="right" src="demo/assets/image/dz_cubicroot_gray.png">
+
+```python
+def dz_exp(stick_input, deadzone, n):
+    partial_output = dz_scaled_radial(stick_input, deadzone)
+    input_magnitude = get_magnitude(partial_output)
+    if input_magnitude == 0:
+        return Vector2(0, 0)
+    input_normalized = partial_output / input_magnitude
+    return input_normalized * pow(input_magnitude, n)
+```
+
+(left: n=3; right: n=0.33)
+
+This technique must be combined with a deadzone in order to work well. In this example I've used a scaled radial deadzone, but I could have chosen any other. You may have noticed that this last function needs an additional parameter `n`. It's the exponent, and the function will behave as follows depending on the value of `n`:
+
+- `n > 1`: Increase precision for low input values
+- `n == 1`: No effect
+- `n < 1 && n > 0`: Increase precision for high input values
+- `n < 0`: No sense
+
 Testing
 -------
 
@@ -197,38 +222,13 @@ Well, so below you can see the results table for these tests that I've run. You 
 | **Hybrid** | PASS | PASS | PASS | PASS | PASS | FAIL |
 | **PS3?** | PASS | PASS | PASS | PASS | PASS | FAIL |
 
-### Beyond deadzones: non-linear input
-Non-linear input mappings can be used to enhance precision in a certain interval, at the cost of losing precision on the other part. A common application for this kind of input are fine-grained aiming systems: with a thumbstick graph like the one below (left), users have a wider range of movements for low input values, which lets them to make very subtle adjustments much easier.
-
-![Non linear input - Cubic][dz_cubic]
-<img width="400" height="400" alt="Cubic root" align="right" src="demo/assets/image/dz_cubicroot_gray.png">
-
-```python
-def dz_exp(stick_input, deadzone, n):
-    partial_output = dz_scaled_radial(stick_input, deadzone)
-    input_magnitude = get_magnitude(partial_output)
-    if input_magnitude == 0:
-        return Vector2(0, 0)
-    input_normalized = partial_output / input_magnitude
-    return input_normalized * pow(input_magnitude, n)
-```
-
-(left: n = 3; right: n = 0.33)
-
-This technique must be combined with a deadzone in order to work well. In this example I've used a scaled radial deadzone, but I could have chosen any other. You may have noticed that this last function needs an additional parameter `n`. It's the exponent, and the function will behave as follows depending on the value of `n`:
-
-- `n > 1`: Increase precision for low input values
-- `n == 1`: No effect
-- `n < 1 && n > 0`: Increase precision for high input values
-- `n < 0`: No sense
-
 Final notes
 -----------
 Well, that's all for now. I hope you've find it useful. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
 
-TODO
-----
+### TODO
 - More testing with PS3, PS4, Xbox ONE controllers
+- Figure out how to get rid of artifacts in hybrid deadzone
 - Finish this document
 - Demo screen for stick input real-time visualisation
 

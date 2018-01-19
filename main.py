@@ -109,11 +109,11 @@ def dz_sloped_scaled_axial_y(stick_input, deadzone):
         y_val = sign * map_range(abs(stick_input[1]), (deadzone_y, 1, 0, 1))
     return 0, y_val
 
-def dz_sloped_scaled_axial(stick_input, deadzone):
+def dz_sloped_scaled_axial(stick_input, deadzone, n=1):
     x_val = 0
     y_val = 0
-    deadzone_x = deadzone * abs(stick_input[1])
-    deadzone_y = deadzone * abs(stick_input[0])
+    deadzone_x = deadzone * np.power(abs(stick_input[1]), n)
+    deadzone_y = deadzone * np.power(abs(stick_input[0]), n)
     sign = np.sign(stick_input)
     if abs(stick_input[0]) > deadzone_x:
         x_val = sign[0] * map_range(abs(stick_input[0]), (deadzone_x, 1, 0, 1))
