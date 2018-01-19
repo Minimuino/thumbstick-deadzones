@@ -163,6 +163,8 @@ You may not see very much difference between this final graph and the first raw 
 ![No deadzone (highlighted)][dz_none_highlighted]
 <img width="400" height="400" alt="Hybrid deadzone" align="right" src="demo/assets/image/dz_hybrid_highlighted.png">
 
+(left: input with no deadzone; right: input with hybrid deadzone)
+
 As you can see, without a deadzone it will be very difficult for a user to give input in one axis only. However, with the hybrid deadzone there's a safe area to perform one-axis input whose width depends not only on the deadzone value, but also on the current input reading.
 
 All the images above were generated with a deadzone value of 0.2 for illustrative purposes. In the real world it would be pretty high for a high-end controller, although the cheap ones actually need a similar value to work well.
@@ -190,10 +192,35 @@ Well, so below you can see the results table for these tests that I've run. You 
 
 |  | 1 | 2 | 3 | 4 | 5 | 6 |
 |--|---|---|---|---|---|---|
-| Axial | PASS | FAIL | FAIL | PASS | FAIL | FAIL |
-| Scaled Radial | PASS | PASS | PASS | FAIL | FAIL | PASS |
-| Hybrid | PASS | PASS | PASS | PASS | PASS | FAIL |
-| PS3? | PASS | PASS | PASS | PASS | PASS | FAIL |
+| **Axial** | PASS | FAIL | FAIL | PASS | FAIL | FAIL |
+| **Scaled Radial** | PASS | PASS | PASS | FAIL | FAIL | PASS |
+| **Hybrid** | PASS | PASS | PASS | PASS | PASS | FAIL |
+| **PS3?** | PASS | PASS | PASS | PASS | PASS | FAIL |
+
+### Beyond deadzones: non-linear input
+Non-linear input mappings can be used to enhance precision in a certain interval, at the cost of losing precision on the other part. A common application for this kind of input are fine-grained aiming systems: with a thumbstick graph like the one below (left), users have a wider range of movements for low input values, which lets them to make very subtle adjustments much easier.
+
+![Non linear input - Cubic][dz_cubic]
+<img width="400" height="400" alt="Cubic root" align="right" src="demo/assets/image/dz_cubicroot_gray.png">
+
+```python
+def dz_exp(stick_input, deadzone, n):
+    partial_output = dz_scaled_radial(stick_input, deadzone)
+    input_magnitude = get_magnitude(partial_output)
+    if input_magnitude == 0:
+        return Vector2(0, 0)
+    input_normalized = partial_output / input_magnitude
+    return input_normalized * pow(input_magnitude, n)
+```
+
+(left: n = 3; right: n = 0.33)
+
+This technique must be combined with a deadzone in order to work well. In this example I've used a scaled radial deadzone, but I could have chosen any other. You may have noticed that this last function needs an additional parameter `n`. It's the exponent, and the function will behave as follows depending on the value of `n`:
+
+- `n > 1`: Increase precision for low input values
+- `n == 1`: No effect
+- `n < 1 && n > 0`: Increase precision for high input values
+- `n < 0`: No sense
 
 Final notes
 -----------
@@ -202,8 +229,8 @@ Well, that's all for now. I hope you've find it useful. If you have any thoughts
 TODO
 ----
 - More testing with PS3, PS4, Xbox ONE controllers
-- Explore non-linear mappings
 - Finish this document
+- Demo screen for stick input real-time visualisation
 
 License
 -------
@@ -228,3 +255,5 @@ Permission is granted to copy, distribute and/or modify this document under the 
 [dz_sloped_scaled_axial_rgb]: demo/assets/image/dz_sloped_scaled_axial_rgb.png "Sloped scaled axial deadzone"
 [dz_hybrid_rgb]: demo/assets/image/dz_hybrid_rgb.png "Hybrid deadzone"
 [dz_none_highlighted]: demo/assets/image/dz_none_highlighted.png "No deadzone"
+[dz_cubic_gray]: demo/assets/image/dz_cubic_gray.png "Cubic"
+[dz_cubicroot_gray]: demo/assets/image/dz_cubicroot_gray.png "Cubic root"

@@ -49,6 +49,8 @@ DeadzoneDemo.Preloader.prototype =
 		this.load.image('img_dz_Sloped Axial', 'assets/image/dz_sloped_axial_rgb.png');
 		this.load.image('img_dz_Sloped Sc. Axial', 'assets/image/dz_sloped_scaled_axial_rgb.png');
 		this.load.image('img_dz_Hybrid', 'assets/image/dz_hybrid_rgb.png');
+		this.load.image('img_dz_Cubic', 'assets/image/dz_cubic_gray.png');
+		this.load.image('img_dz_Cubic root', 'assets/image/dz_cubicroot_gray.png');
 	},
 
 	create: function()

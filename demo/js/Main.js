@@ -24,7 +24,8 @@ DeadzoneDemo.Main = function(game)
 	this.pad1;
 	this.dz_value = 0;
 	this.dz_type;
-	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial", "Sloped Axial", "Sloped Sc. Axial", "Hybrid"];
+	this.dz_names = ["None", "Axial", "Radial", "Scaled Radial", "Sloped Axial",
+		"Sloped Sc. Axial", "Hybrid", "Cubic", "Cubic root"];
 	this.display_text = [];
 	this.display_img;
 	this.cursors;
@@ -214,6 +215,35 @@ DeadzoneDemo.Main.prototype =
 		return result;
 	},
 
+	dzExp: function(stick_input, n)
+	{
+		var magnitude = stick_input.getMagnitude();
+		if (magnitude == 0.0)
+		{
+			return new Phaser.Point(0, 0);
+		}
+		else
+		{
+			var input_normalized = Phaser.Point.normalize(stick_input);
+			var result = new Phaser.Point();
+			result.x = input_normalized.x * Math.pow(magnitude, n);
+			result.y = input_normalized.y * Math.pow(magnitude, n);
+			return result;
+		}
+	},
+
+	dzCubic: function(stick_input, deadzone)
+	{
+		var partial_output = this.dzScaledRadial(stick_input, deadzone);
+		return this.dzExp(partial_output, 3);
+	},
+
+	dzCubicRoot: function(stick_input, deadzone)
+	{
+		var partial_output = this.dzScaledRadial(stick_input, deadzone);
+		return this.dzExp(partial_output, 0.33);
+	},
+
 	applyDeadzone: function(stick_input)
 	{
 		var dz_functions = {
@@ -224,7 +254,9 @@ DeadzoneDemo.Main.prototype =
 			"Scaled Radial": this.dzScaledRadial,
 			"Sloped Axial": this.dzSlopedAxial,
 			"Sloped Sc. Axial": this.dzSlopedScaledAxial,
-			"Hybrid": this.dzHybrid
+			"Hybrid": this.dzHybrid,
+			"Cubic": this.dzCubic,
+			"Cubic root": this.dzCubicRoot
 		};
 		var name = this.dz_names[this.dz_type];
 		return dz_functions[name].call(this, stick_input, this.dz_value);

@@ -21,7 +21,6 @@
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.spatial import distance as dist
 
 
 # UTILS
@@ -149,6 +148,13 @@ def dz_hybrid(stick_input, deadzone):
 
     return final_output
 
+def dz_exp(stick_input, deadzone, n=3):
+    partial_output = dz_scaled_radial(stick_input, deadzone)
+    input_magnitude = np.linalg.norm(partial_output)
+    if input_magnitude == 0:
+        return 0, 0
+    input_normalized = partial_output / input_magnitude
+    return input_normalized * np.power(input_magnitude, n)
 
 ################################################################################
 
@@ -157,8 +163,8 @@ height = 400
 width  = 400
 center = (height/2, width/2)
 deadzone = 0.2
-deadzone_function = dz_scaled_radial
-mode = 'gray'
+deadzone_function = dz_hybrid
+mode = 'rgb'
 
 def generate_gray_image():
     # Base blank image
