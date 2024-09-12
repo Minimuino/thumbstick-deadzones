@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 
 
 # UTILS
-def map_range(v, (old_min, old_max, new_min, new_max)):
+def map_range(v, old_min, old_max, new_min, new_max):
     return (new_min + (new_max - new_min) * (v - old_min) / (old_max - old_min))
 
 
@@ -73,14 +73,14 @@ def dz_scaled_axial_x(stick_input, deadzone):
     x_val = 0
     sign = np.sign(stick_input[0])
     if abs(stick_input[0]) > deadzone:
-        x_val = sign * map_range(abs(stick_input[0]), (deadzone, 1, 0, 1))
+        x_val = sign * map_range(abs(stick_input[0]), deadzone, 1, 0, 1)
     return x_val, 0
 
 def dz_scaled_axial_y(stick_input, deadzone):
     y_val = 0
     sign = np.sign(stick_input[1])
     if abs(stick_input[1]) > deadzone:
-        y_val = sign * map_range(abs(stick_input[1]), (deadzone, 1, 0, 1))
+        y_val = sign * map_range(abs(stick_input[1]), deadzone, 1, 0, 1)
     return 0, y_val
 
 def dz_scaled_axial(stick_input, deadzone):
@@ -88,9 +88,9 @@ def dz_scaled_axial(stick_input, deadzone):
     y_val = 0
     sign = np.sign(stick_input)
     if abs(stick_input[0]) > deadzone:
-        x_val = sign[0] * map_range(abs(stick_input[0]), (deadzone, 1, 0, 1))
+        x_val = sign[0] * map_range(abs(stick_input[0]), deadzone, 1, 0, 1)
     if abs(stick_input[1]) > deadzone:
-        y_val = sign[1] * map_range(abs(stick_input[1]), (deadzone, 1, 0, 1))
+        y_val = sign[1] * map_range(abs(stick_input[1]), deadzone, 1, 0, 1)
     return x_val, y_val
 
 def dz_sloped_scaled_axial_x(stick_input, deadzone):
@@ -98,7 +98,7 @@ def dz_sloped_scaled_axial_x(stick_input, deadzone):
     deadzone_x = deadzone * abs(stick_input[1])
     sign = np.sign(stick_input[0])
     if abs(stick_input[0]) > deadzone_x:
-        x_val = sign * map_range(abs(stick_input[0]), (deadzone_x, 1, 0, 1))
+        x_val = sign * map_range(abs(stick_input[0]), deadzone_x, 1, 0, 1)
     return x_val, 0
 
 def dz_sloped_scaled_axial_y(stick_input, deadzone):
@@ -106,7 +106,7 @@ def dz_sloped_scaled_axial_y(stick_input, deadzone):
     deadzone_y = deadzone * abs(stick_input[0])
     sign = np.sign(stick_input[1])
     if abs(stick_input[1]) > deadzone_y:
-        y_val = sign * map_range(abs(stick_input[1]), (deadzone_y, 1, 0, 1))
+        y_val = sign * map_range(abs(stick_input[1]), deadzone_y, 1, 0, 1)
     return 0, y_val
 
 def dz_sloped_scaled_axial(stick_input, deadzone, n=1):
@@ -116,9 +116,9 @@ def dz_sloped_scaled_axial(stick_input, deadzone, n=1):
     deadzone_y = deadzone * np.power(abs(stick_input[0]), n)
     sign = np.sign(stick_input)
     if abs(stick_input[0]) > deadzone_x:
-        x_val = sign[0] * map_range(abs(stick_input[0]), (deadzone_x, 1, 0, 1))
+        x_val = sign[0] * map_range(abs(stick_input[0]), deadzone_x, 1, 0, 1)
     if abs(stick_input[1]) > deadzone_y:
-        y_val = sign[1] * map_range(abs(stick_input[1]), (deadzone_y, 1, 0, 1))
+        y_val = sign[1] * map_range(abs(stick_input[1]), deadzone_y, 1, 0, 1)
     return x_val, y_val
 
 def dz_scaled_radial(stick_input, deadzone):
@@ -131,7 +131,7 @@ def dz_scaled_radial(stick_input, deadzone):
         # max_value = 1
         # min_value = 0
         # retval = input_normalized * (min_value + (max_value - min_value) * ((input_magnitude - deadzone) / (max_value - deadzone)))
-        retval = input_normalized * map_range(input_magnitude, (deadzone, 1, 0, 1))
+        retval = input_normalized * map_range(input_magnitude, deadzone, 1, 0, 1)
         return retval[0], retval[1]
 
 def dz_hybrid(stick_input, deadzone):
@@ -174,7 +174,7 @@ def generate_gray_image():
     for i in range(height):
         for j in range(width):
             # Simulate stick input
-            fake_stick_input = np.array([j - center[1], i - center[0]], dtype=np.float)
+            fake_stick_input = np.array([j - center[1], i - center[0]], dtype=float)
             fake_stick_input /= (height / 2)
             # Clamp fake input to stick boundaries
             magnitude = np.linalg.norm(fake_stick_input)
@@ -184,13 +184,13 @@ def generate_gray_image():
                 # Compute deadzoned value
                 n, m = deadzone_function(fake_stick_input, deadzone)
                 dz_magnitude = np.linalg.norm([n,m])
-                img[i,j] = map_range(dz_magnitude, (0, 1, 0, 255))
+                img[i,j] = map_range(dz_magnitude, 0, 1, 0, 255)
 
     # Print image
     plt.imshow(img, cmap=plt.cm.gray, vmin=0, vmax=255,
                aspect='equal', interpolation='bilinear')
     plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-    plt.show(False)
+    plt.show()
 
     return img
 
@@ -202,7 +202,7 @@ def generate_rgb_image():
     for i in range(height):
         for j in range(width):
             # Simulate stick input
-            fake_stick_input = np.array([j - center[1], i - center[0]], dtype=np.float)
+            fake_stick_input = np.array([j - center[1], i - center[0]], dtype=float)
             fake_stick_input /= (height / 2)
             # Clamp fake input to stick boundaries
             magnitude = np.linalg.norm(fake_stick_input)
@@ -211,14 +211,14 @@ def generate_rgb_image():
             else:
                 # Compute deadzoned value
                 n, m = deadzone_function(fake_stick_input, deadzone)
-                img[i,j,0] = map_range(abs(m), (0, 1, 0, 255))
-                img[i,j,2] = map_range(abs(n), (0, 1, 0, 255))
+                img[i,j,0] = map_range(abs(m), 0, 1, 0, 255)
+                img[i,j,2] = map_range(abs(n), 0, 1, 0, 255)
 
     # Print image
     plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB), vmin=0, vmax=255,
                aspect='equal', interpolation='bilinear')
     plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-    plt.show(False)
+    plt.show()
 
     return img
 
@@ -231,10 +231,10 @@ def main():
         img = generate_rgb_image()
 
     # Listen for input
-    command = raw_input()
+    command = input()
     if command == 's':
-        print "File name: "
-        filename = raw_input()
+        print("File name: ")
+        filename = input()
         cv.imwrite(filename, img)
 
 if __name__ == '__main__':
