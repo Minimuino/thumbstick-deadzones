@@ -13,13 +13,10 @@ I recommend to open the [demo](https://minimuino.github.io/thumbstick-deadzones/
 Deadzone types
 --------------
 
-**!!! Article under construction !!!**
-
-
 Now I will discuss deadzone types. For each type, a graph and some python-ish pseudocode will be provided. First of all I will explain how to interpret the graphs. We will be working with two types of graphs, both of them represent all possible values of some thumbstick input (with an arbitrary sampling rate):
 
-- Grayscale: normalized magnitude of input vector.
-- RGB: normalized axis value of input vector.
+- Grayscale: magnitude of input vector.
+- RGB: axis value of input vector.
 
 Each pixel on the image corresponds to a single position of the stick. If we don't apply a deadzone, our raw input graphs will look like this:
 
@@ -64,7 +61,7 @@ def dz_radial(stick_input, deadzone):
 		return Vector2(stick_input)
 ```
 
-But with this deadzone type there is another issue: we lose precision on the process. We're no longer getting input between -1 and 1, but rather in the [-1, -deadzone] and [deadzone, 1] intervals. If by clamping input we lose precision, then we don't should clamp, but rather *scale* input. We want to turn that sharp black edge into a smooth transition. In order to do that, I'm using a function that takes a value from an input range and returns its equivalent in the specified output range:
+But with this deadzone type there is another issue: we lose precision on the process. We're no longer getting input between -1 and 1, but rather in the [-1, -deadzone] and [deadzone, 1] intervals. If by clamping input we lose precision, then we don't should clamp, but rather *scale* input. We want to turn that sharp black edge into a smooth transition. In order to do that, I'm using a function that takes a value from an input range and returns its equivalent in the specified output range (i.e. linear interpolation):
 
 ```python
 def map_range(value, old_min, old_max, new_min, new_max):
@@ -167,7 +164,30 @@ You may not see very much difference between this final graph and the first raw 
 
 As you can see, without a deadzone it will be very difficult for a user to give input in one axis only. However, with the hybrid deadzone there's a safe area to perform one-axis input whose width depends not only on the deadzone value, but also on the current input reading.
 
-All the images above were generated with a deadzone value of 0.2 for illustrative purposes. In the real world it would be pretty high for a high-end controller, although the cheap ones actually need a similar value to work well.
+All the images above were generated with a deadzone value of 0.2 for illustrative purposes. In the real world it would be a bit excessive for a high-end controller, although the cheap ones actually need a value close to 0.2 in order to work properly.
+
+### Outer deadzone
+
+When the magnitude of the raw input value is above 1, we should normalize the vector to avoid returning a value higher than 1. But what happens if the thumbstick gives always a maximum value below 1? Depending on the case, we may get into trouble. If the vector magnitude of the input is critical in your game or application, you should apply also an outer deadzone, or at least let the user adjust it though the settings. This is what a scaled radial inner/outer deadzone looks like:
+
+<p align="center">
+  <img width="400" height="400" alt="Scaled radial inner and outer deadzone" src="demo/assets/image/dz_scaled_radial_inner_and_outer_gray.png">
+</p>
+
+```python
+def dz_scaled_radial_inner_and_outer(stick_input, inner_deadzone, outer_deadzone):
+	input_magnitude = get_magnitude(stick_input)
+	if input_magnitude < inner_deadzone:
+		return Vector2(0, 0)
+	elif input_magnitude > (1 - outer_deadzone):
+        return stick_input / input_magnitude
+	else:
+		input_normalized = stick_input / input_magnitude
+		result = input_normalized * map_range(input_magnitude, inner_deadzone, 1 - outer_deadzone, 0, 1)
+		return result
+```
+
+As you can see, there is a full white ring all along the outer zone of the input, meaning that any value that falls within that zone will be mapped to a normalized vector of magnitude equal to 1. Hence we have an inner deadzone where all values are shrinked to (0, 0) and an outer deadzone where all values are expanded to have length = 1.
 
 ### Beyond deadzones: non-linear input
 Non-linear input mappings can be used to enhance precision in a certain interval, at the cost of losing precision on the other part. A common application for this kind of input are fine-grained aiming systems: with a thumbstick graph like the one below (left), users have a wider range of movements for low input values, which lets them to make very subtle adjustments much easier.
@@ -193,6 +213,14 @@ This technique must be combined with a deadzone in order to work well. In this e
 - `n == 1`: No effect
 - `n < 1 && n > 0`: Increase precision for high input values
 - `n < 0`: No sense
+
+This kind of input mapping is useful only in very specific situations, but in complex scenarios like 3D shooters or flight simulators you will probably have to implement dynamic deadzone changes depending on the action the user is performing. For example, on the left stick of a gamepad you may use some basic deadzone for player movement and a different one for vehicle movement; on the right stick you may use another deadzone for general camera movement and some non-linear mapping for high precision aiming.
+
+Another interesting application of non-linear input mappings is directional adjustment, commonly used in aim assist for 2D games. This is a complex topic and is out of the scope of this article, but I will show a very simple example for you to see how it works. If you want to know more, this video contains a great explanation on this topic: https://www.youtube.com/watch?v=yGci-Lb87zs
+
+image
+
+pseudocode
 
 Testing
 -------
@@ -224,12 +252,10 @@ Well, so below you can see the results table for these tests that I've run. You 
 
 Final notes
 -----------
-Well, that's all for now. I hope you've find it useful. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
+Well, that's all for now. I hope you've find it useful. Remember that there's no golden solution for every situation, so you have to pick the input mapping that best fits your needs. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
 
-### TODO
-- More testing with PS3, PS4, Xbox ONE controllers
-- Figure out how to get rid of artifacts in hybrid deadzone
-- Finish this document
+### Future work
+- Figure out how to get rid of distortion for low input values in hybrid deadzone
 - Demo screen for stick input real-time visualisation
 
 License
