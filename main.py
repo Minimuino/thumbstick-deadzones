@@ -22,8 +22,6 @@ import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 
-TAU = 2 * np.pi
-
 # UTILS
 def map_range(v, old_min, old_max, new_min, new_max):
     return (new_min + (new_max - new_min) * (v - old_min) / (old_max - old_min))
@@ -167,52 +165,6 @@ def dz_scaled_radial_inner_and_outer(stick_input, inner_deadzone, outer_deadzone
         input_normalized = stick_input / input_magnitude
         retval = input_normalized * map_range(input_magnitude, inner_deadzone, 1 - outer_deadzone, 0, 1)
         return retval[0], retval[1]
-
-def directional_adjustment(stick_input, target_direction, angle_range=np.pi/4):
-    input_magnitude = np.linalg.norm(stick_input)
-    if input_magnitude == 0:
-        return 0, 0
-
-    target_direction_normalized = target_direction / np.linalg.norm(target_direction)
-
-    # Find out the angles of the vectors in the [-pi, pi] range
-    input_angle = np.arctan2(stick_input[1], stick_input[0])
-    target_direction_angle = np.arctan2(target_direction[1], target_direction[0])
-
-    # Apply directional adjustment if the input falls within the zone delimited by target_direction and angle_range
-    angle_diff = find_shortest_angle_diff(input_angle, target_direction_angle)
-    if abs(angle_diff) < angle_range:
-        return np.array(target_direction_normalized) * input_magnitude
-
-    # Shrink all values out of adjustment zone
-    # First calculate the limits of the adjustment zone
-    adjustment_zone_bottom = keep_angle_in_minuspi_pi_interval(target_direction_angle - angle_range)
-    adjustment_zone_top = keep_angle_in_minuspi_pi_interval(target_direction_angle + angle_range)
-
-    # Now calculate the new angle by using a discontinuous linear mapping function
-    new_angle = target_direction_angle
-    if adjustment_zone_bottom >= adjustment_zone_top:
-        new_angle = line_equation_from_two_points(input_angle, (-np.pi + angle_range, -np.pi), (np.pi - angle_range, np.pi))
-    elif input_angle > adjustment_zone_top:
-        new_angle = line_equation_from_two_points(input_angle, (adjustment_zone_top, target_direction_angle), (adjustment_zone_bottom + TAU, target_direction_angle + TAU))
-    elif input_angle < adjustment_zone_bottom:
-        new_angle = line_equation_from_two_points(input_angle, (adjustment_zone_top - TAU, target_direction_angle - TAU), (adjustment_zone_bottom, target_direction_angle))
-
-    return np.array((np.cos(new_angle), np.sin(new_angle))) * input_magnitude
-
-def find_shortest_angle_diff(input_angle, target_direction_angle):
-    return keep_angle_in_minuspi_pi_interval(input_angle - target_direction_angle)
-
-def keep_angle_in_minuspi_pi_interval(angle):
-    if angle > np.pi:
-        return angle -TAU
-    elif angle < -np.pi:
-        return angle + TAU
-    else:
-        return angle
-
-def line_equation_from_two_points(x, p1, p2):
-    return ((p2[1] - p1[1])/(p2[0] - p1[0]))*(x - p1[0]) + p1[1]
 
 ################################################################################
 

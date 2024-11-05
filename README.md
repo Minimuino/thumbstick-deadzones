@@ -216,11 +216,61 @@ This technique must be combined with a deadzone in order to work well. In this e
 
 This kind of input mapping is useful only in very specific situations, but in complex scenarios like 3D shooters or flight simulators you will probably have to implement dynamic deadzone changes depending on the action the user is performing. For example, on the left stick of a gamepad you may use some basic deadzone for player movement and a different one for vehicle movement; on the right stick you may use another deadzone for general camera movement and some non-linear mapping for high precision aiming.
 
-Another interesting application of non-linear input mappings is directional adjustment, commonly used in aim assist for 2D games. This is a complex topic and is out of the scope of this article, but I will show a very simple example for you to see how it works. If you want to know more, this video contains a great explanation on this topic: https://www.youtube.com/watch?v=yGci-Lb87zs
+Another interesting application of non-linear input mappings is directional adjustment, commonly used in aim assist for 2D games. This is a complex topic and it falls out of the scope of this article, but I will show a very simple example for you to see how it works. If you want to know more, this video contains a great explanation: https://www.youtube.com/watch?v=yGci-Lb87zs
 
-image
+<p align="center">
+  <img width="400" height="400" alt="Directional adjustment" src="demo/assets/image/directional_adjustment_rgb.png">
+</p>
 
-pseudocode
+```python
+TAU = 2 * PI
+
+def directional_adjustment(stick_input, target_direction, angle_range):
+    input_magnitude = get_magnitude(stick_input)
+    if input_magnitude == 0:
+        return Vector2(0, 0)
+
+    # Find out the angles of the vectors in the [-pi, pi] range
+    input_angle = arctan2(stick_input.y, stick_input.x)
+    target_direction_angle = arctan2(target_direction.y, target_direction.x)
+
+    # Apply directional adjustment if the input falls within the zone delimited by target_direction and angle_range
+    angle_diff = keep_angle_in_minuspi_pi_interval(input_angle - target_direction_angle)
+    if abs(angle_diff) < angle_range:
+        return normalize(target_direction) * input_magnitude
+
+    # Shrink all values out of adjustment zone
+    # First calculate the limits of the adjustment zone (in radians)
+    adjustment_zone_bottom = target_direction_angle - angle_range
+    adjustment_zone_top = target_direction_angle + angle_range
+
+    # Now calculate the new angle by using the line equation from two known points
+    new_angle = target_direction_angle
+    if input_angle > adjustment_zone_top:
+        new_angle = line_equation_from_two_points(input_angle, (adjustment_zone_top, target_direction_angle),
+                                                  (adjustment_zone_bottom + TAU, target_direction_angle + TAU))
+    elif input_angle < adjustment_zone_bottom:
+        new_angle = line_equation_from_two_points(input_angle, (adjustment_zone_top - TAU, target_direction_angle - TAU),
+                                                  (adjustment_zone_bottom, target_direction_angle))
+
+    return Vector2(cos(new_angle), sin(new_angle)) * input_magnitude
+```
+
+Here `target_direction` is the direction we want to point at for any stick input that falls within the range `[target_direction - angle_range, target_direction + angle_range]`. But in order to have a smooth transition and keep all stick input values reachable, we have to scale the rest of the input space, just like we did before. As you can see in the image above, a quarter of the circle is fully colored in plain pink. That means any value in that quarter will be translated to (-1, -1) keeping its original vector length. The rest of the circle contains a scaled view of the input space: all possible directions different from (-1, -1) are compressed to fit only 3/4 of a circle. In order to avoid distortion and keep the blue/red zones closer to the vertical/horizontal axes, an easing function shall be applied between the adjustment zone and the rest of the circle, but in this example I prefer to keep it simple.
+
+The idea behind this code is to see the stick input vector as an angle and use a function like this one to map all possible values from one input space to another.
+
+<p align="center">
+  <img width="640" height="480" alt="Plot" src="directional_adjustment_plot.png">
+</p>
+
+In the plot above, `target_direction` is equal to (1, 0) and `angle_range` is π/4.
+
+Now the following animation shows how we can change `taget_direction` and `angle_range` parameters to get different results. If you want to dig into the code and see how it works, you will be able to generate animations like this one with the script named directional_adjustment.py in this repo.
+
+<video width="400" height="400" controls>
+  <source src="variable_range_animation.mp4" type="video/mp4">
+</video>
 
 Testing
 -------
