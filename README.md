@@ -216,7 +216,7 @@ This technique must be combined with a deadzone in order to work well. In this e
 
 This kind of input mapping is useful only in very specific situations, but in complex scenarios like 3D shooters or flight simulators you will probably have to implement dynamic deadzone changes depending on the action the user is performing. For example, on the left stick of a gamepad you may use some basic deadzone for player movement and a different one for vehicle movement; on the right stick you may use another deadzone for general camera movement and some non-linear mapping for high precision aiming.
 
-Another interesting application of non-linear input mappings is directional adjustment, commonly used in aim assist for 2D games. This is a complex topic and it falls out of the scope of this article, but I will show a very simple example for you to see how it works. If you want to know more, this video contains a great explanation: https://www.youtube.com/watch?v=yGci-Lb87zs
+Another interesting application of non-linear input mappings is directional adjustment, commonly used in aim assist for 2D games. This is a complex topic and it falls out of the scope of this article, but I will show a very simple example for you to see how it works. If you want to know more, [this video](https://www.youtube.com/watch?v=yGci-Lb87zs) contains a great explanation.
 
 <p align="center">
   <img width="400" height="400" alt="Directional adjustment" src="demo/assets/image/directional_adjustment_rgb.png">
@@ -268,9 +268,7 @@ In the plot above, `target_direction` is equal to (1, 0) and `angle_range` is π
 
 Now the following animation shows how we can change `taget_direction` and `angle_range` parameters to get different results. If you want to dig into the code and see how it works, you will be able to generate animations like this one with the script named directional_adjustment.py in this repo.
 
-<video width="400" height="400" controls>
-  <source src="variable_range_animation.mp4" type="video/mp4">
-</video>
+https://raw.githubusercontent.com/Minimuino/thumbstick-deadzones/refs/heads/master/variable_range_animation.mp4
 
 Testing
 -------
@@ -291,14 +289,16 @@ Relevant test cases for the demo:
 
 I've been doing some testing with both Xbox 360 and PS3 official controllers (Debian + Firefox environment), and I've found something quite interesting: with PS3 controller there's no need to do deadzone processing at all. It works reeeally smooth in every case... with deadzone set to *None*! One may think that it could be just an excellent piece of hardware and no post-processing is needed. But test #6 reveals something against this hypothesis: it "stops" at certain angles, very similar to our hybrid deadzone behavior. That's a clear proof of a deadzone post-process running beneath the surface. Does the PS3 controller have kind of a built-in deadzone? Or is it the linux driver? No idea. So, please, if you can throw some light on this issue, I'd really appreciate it. I've also tested the Dualshock in Cocos2D engine with identical result.
 
-Well, so below you can see the results table for these tests that I've run. You can reproduce them in the demo. Also, I'm looking forward to test Xbox ONE and PS4 controllers as soon as possible.
+I've recently run new tests with Xbox ONE and PS4 controllers. The behaviour of the Dualshock 4 is similar to the Dualshock 3, only with very subtle differences. The Xbox ONE controller does not perform any type of deadzone processing, although in this case the stick feels much more sensitive and easy to control than its Xbox 360 counterpart. Well, so below you can see the results table for these tests that I've run. You can reproduce them in the demo.
 
 |  | 1 | 2 | 3 | 4 | 5 | 6 |
 |--|---|---|---|---|---|---|
 | **Axial** | PASS | FAIL | FAIL | PASS | FAIL | FAIL |
 | **Scaled Radial** | PASS | PASS | PASS | FAIL | FAIL | PASS |
 | **Hybrid** | PASS | PASS | PASS | PASS | PASS | FAIL |
-| **PS3?** | PASS | PASS | PASS | PASS | PASS | FAIL |
+| **PS3 (No DZ)** | PASS | PASS | PASS | PASS | PASS | FAIL |
+| **PS4 (No DZ)** | PASS | PASS | PASS | PASS | PASS | FAIL |
+| **XBOX ONE (No DZ)** | FAIL | PASS | PASS | FAIL | FAIL | PASS |
 
 Final notes
 -----------
