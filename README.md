@@ -38,12 +38,12 @@ Open the [demo](https://minimuino.github.io/thumbstick-deadzones/demo/) and move
 
 ```python
 def dz_axial(stick_input, deadzone):
-	result = Vector2(stick_input)
-	if (abs(result.x) < deadzone)
-		result.x = 0
-	if (abs(result.y) < deadzone)
-		result.y = 0
-	return result
+    result = Vector2(stick_input)
+    if (abs(result.x) < deadzone)
+        result.x = 0
+    if (abs(result.y) < deadzone)
+        result.y = 0
+    return result
 ```
 
 This deadzone type causes kind of a "snap to grid" effect, very uncomfortable for 3D environments. At the demo, try to perform a slow circular motion, and you will notice this issue. So here is the next step, radial deadzone:
@@ -54,18 +54,18 @@ This deadzone type causes kind of a "snap to grid" effect, very uncomfortable fo
 
 ```python
 def dz_radial(stick_input, deadzone):
-	input_magnitude = get_magnitude(stick_input)
-	if input_magnitude < deadzone:
-		return Vector2(0, 0)
-	else:
-		return Vector2(stick_input)
+    input_magnitude = get_magnitude(stick_input)
+    if input_magnitude < deadzone:
+        return Vector2(0, 0)
+    else:
+        return Vector2(stick_input)
 ```
 
 But with this deadzone type there is another issue: we lose precision on the process. We're no longer getting input between -1 and 1, but rather in the [-1, -deadzone] and [deadzone, 1] intervals. If by clamping input we lose precision, then we don't should clamp, but rather *scale* input. We want to turn that sharp black edge into a smooth transition. In order to do that, I'm using a function that takes a value from an input range and returns its equivalent in the specified output range (i.e. linear interpolation):
 
 ```python
 def map_range(value, old_min, old_max, new_min, new_max):
-	return (new_min + (new_max - new_min) * (value - old_min) / (old_max - old_min))
+    return (new_min + (new_max - new_min) * (value - old_min) / (old_max - old_min))
 ```
 
 Then, we have our scaled radial deadzone:
@@ -76,13 +76,13 @@ Then, we have our scaled radial deadzone:
 
 ```python
 def dz_scaled_radial(stick_input, deadzone):
-	input_magnitude = get_magnitude(stick_input)
-	if input_magnitude < deadzone:
-		return Vector2(0, 0)
-	else:
-		input_normalized = stick_input / input_magnitude
-		result = input_normalized * map_range(input_magnitude, deadzone, 1, 0, 1)
-		return result
+    input_magnitude = get_magnitude(stick_input)
+    if input_magnitude < deadzone:
+        return Vector2(0, 0)
+    else:
+        input_normalized = stick_input / input_magnitude
+        result = input_normalized * map_range(input_magnitude, deadzone, 1, 0, 1)
+        return result
 ```
 
 Now try the slowest movement you can perform with both radial and scaled radial deadzones. You will notice that with the scaled radial you have a wider speed range, in particular at low speeds. The transition from stillnes to movement is much smoother with scaled radial.
@@ -105,12 +105,12 @@ Points 1 and 2 lead us to the conclusion that we need a variable deadzone instea
 def dz_sloped_axial(stick_input, deadzone):
     deadzone_x = deadzone * abs(stick_input.y)
     deadzone_y = deadzone * abs(stick_input.x)
-	result = Vector2(stick_input)
-	if (abs(result.x) < deadzone_x)
-		result.x = 0
-	if (abs(result.y) < deadzone_y)
-		result.y = 0
-	return result
+    result = Vector2(stick_input)
+    if (abs(result.x) < deadzone_x)
+        result.x = 0
+    if (abs(result.y) < deadzone_y)
+        result.y = 0
+    return result
 ```
 
 In the sample code you can see that now deadzone is split in two values (one for each axis). Note also that the deadzone amount for X axis depends on the current Y value, and vice versa.
@@ -125,13 +125,13 @@ Point 3 reminds us that is not a good thing to see edges on the graph. Edges mea
 def dz_sloped_scaled_axial(stick_input, deadzone):
     deadzone_x = deadzone * abs(stick_input.y)
     deadzone_y = deadzone * abs(stick_input.x)
-	result = Vector2(0, 0)
-	sign = Vector2(get_sign(stick_input.x), get_sign(stick_input.y))
-	if (abs(stick_input.x) > deadzone_x)
-		result.x = sign.x * map_range(abs(stick_input.x), deadzone_x, 1, 0, 1)
-	if (abs(stick_input.y) > deadzone_y)
-		result.y = sign.y * map_range(abs(stick_input.y), deadzone_y, 1, 0, 1)
-	return result
+    result = Vector2(0, 0)
+    sign = Vector2(get_sign(stick_input.x), get_sign(stick_input.y))
+    if (abs(stick_input.x) > deadzone_x)
+        result.x = sign.x * map_range(abs(stick_input.x), deadzone_x, 1, 0, 1)
+    if (abs(stick_input.y) > deadzone_y)
+        result.y = sign.y * map_range(abs(stick_input.y), deadzone_y, 1, 0, 1)
+    return result
 ```
 
 Now we shall combine this function with the scaled radial in order to avoid undesired input when the stick is released:
@@ -142,7 +142,7 @@ Now we shall combine this function with the scaled radial in order to avoid unde
 
 ```python
 def dz_hybrid(stick_input, deadzone):
-	input_magnitude = get_magnitude(stick_input)
+    input_magnitude = get_magnitude(stick_input)
     if input_magnitude < deadzone:
         return Vector2(0, 0)
 
@@ -176,15 +176,15 @@ When the magnitude of the raw input value is above 1, we should normalize the ve
 
 ```python
 def dz_scaled_radial_inner_and_outer(stick_input, inner_deadzone, outer_deadzone):
-	input_magnitude = get_magnitude(stick_input)
-	if input_magnitude < inner_deadzone:
-		return Vector2(0, 0)
-	elif input_magnitude > (1 - outer_deadzone):
+    input_magnitude = get_magnitude(stick_input)
+    if input_magnitude < inner_deadzone:
+        return Vector2(0, 0)
+    elif input_magnitude > (1 - outer_deadzone):
         return stick_input / input_magnitude
-	else:
-		input_normalized = stick_input / input_magnitude
-		result = input_normalized * map_range(input_magnitude, inner_deadzone, 1 - outer_deadzone, 0, 1)
-		return result
+    else:
+        input_normalized = stick_input / input_magnitude
+        result = input_normalized * map_range(input_magnitude, inner_deadzone, 1 - outer_deadzone, 0, 1)
+        return result
 ```
 
 As you can see, there is a full white ring all along the outer zone of the input, meaning that any value that falls within that zone will be mapped to a normalized vector of magnitude equal to 1. Hence we have an inner deadzone where all values are shrinked to (0, 0) and an outer deadzone where all values are expanded to have length = 1.
