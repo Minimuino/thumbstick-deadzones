@@ -168,7 +168,7 @@ All the images above were generated with a deadzone value of 0.2 for illustrativ
 
 ### Outer deadzone
 
-When the magnitude of the raw input value is above 1, we should normalize the vector to avoid returning a value higher than 1. But what happens if the thumbstick gives always a maximum value below 1? Depending on the case, we may get into trouble. If the vector magnitude of the input is critical in your game or application, you should apply also an outer deadzone, or at least let the user adjust it though the settings. This is what a scaled radial inner/outer deadzone looks like:
+When the magnitude of the raw input value is above 1, we should normalize the vector to avoid returning a value higher than 1. But what happens if the thumbstick gives always a maximum value below 1? Depending on the case, we may get into trouble. If the vector magnitude of the input is critical in your game or application, you should apply also an outer deadzone, or at least let the user adjust it through the settings. This is what a scaled radial inner/outer deadzone looks like:
 
 <p align="center">
   <img width="400" height="400" alt="Scaled radial inner and outer deadzone" src="demo/assets/image/dz_scaled_radial_inner_and_outer_gray.png">
@@ -256,7 +256,7 @@ def directional_adjustment(stick_input, target_direction, angle_range):
     return Vector2(cos(new_angle), sin(new_angle)) * input_magnitude
 ```
 
-Here `target_direction` is the direction we want to point at for any stick input that falls within the range `[target_direction - angle_range, target_direction + angle_range]`. But in order to have a smooth transition and keep all stick input values reachable, we have to scale the rest of the input space, just like we did before. As you can see in the image above, a quarter of the circle is fully colored in plain pink. That means any value in that quarter will be translated to (-1, -1) keeping its original vector length. The rest of the circle contains a scaled view of the input space: all possible directions different from (-1, -1) are compressed to fit only 3/4 of a circle. In order to avoid distortion and keep the blue/red zones closer to the vertical/horizontal axes, an easing function shall be applied between the adjustment zone and the rest of the circle, but in this example I prefer to keep it simple.
+Here `target_direction` is the direction we want to point at for any stick input that falls within the range `[target_direction - angle_range, target_direction + angle_range]`. But in order to have a smooth transition and keep all stick input values reachable, we have to scale the rest of the input space, just like we did before. As you can see in the image above, a quarter of the circle is fully colored in plain pink. That means any value in that quarter will be translated to (-1, -1) keeping its original vector length. The rest of the circle contains a scaled view of the input space: all possible directions different from (-1, -1) are compressed to fit only 3/4 of a circle. In order to avoid distortion and keep the blue/red zones aligned with the vertical/horizontal axes, an easing function shall be applied between the adjustment zone and the rest of the circle, but in this example I prefer to keep it simple.
 
 The idea behind this code is to see the stick input vector as an angle and use a function like this one to map all possible values from one input space to another.
 
@@ -266,7 +266,7 @@ The idea behind this code is to see the stick input vector as an angle and use a
 
 In the plot above, `target_direction` is equal to (1, 0) and `angle_range` is π/4.
 
-Now the following animation shows how we can change `taget_direction` and `angle_range` parameters to get different results. If you want to dig into the code and see how it works, you will be able to generate animations like this one with the script named directional_adjustment.py in this repo.
+Now the following animation shows how we can change `target_direction` and `angle_range` parameters to get different results. If you want to dig into the code and see how it works, you will be able to generate animations like this one with the script named directional_adjustment.py in this repo.
 
 https://raw.githubusercontent.com/Minimuino/thumbstick-deadzones/refs/heads/master/variable_range_animation.mp4
 
@@ -302,7 +302,7 @@ I've recently run new tests with Xbox ONE and PS4 controllers. The behaviour of 
 
 Final notes
 -----------
-Well, that's all for now. I hope you've find it useful. Remember that there's no golden solution for every situation, so you have to pick the input mapping that best fits your needs. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
+Well, that's all for now. I hope you find it useful. Remember that there's no golden solution for every situation, so you'll have to pick the input mappings that best fit your needs. If you have any thoughts, new ideas or corrections, feel free to fork this repo or to submit a pull request! Thanks for reading! :]
 
 ### Future work
 - Figure out how to get rid of distortion for low input values in hybrid deadzone
